@@ -9,11 +9,13 @@ services:
         restart: always
     app:
         container_name: twitgallery_app
+        build: './app'
+        ports:
+            - 5000:5000
         depends_on:
             - db
         volumes:
             - 'c:\dev\twitgallery\app\src:/usr/src/app'
-        build: './app'
         restart: always
     db:
         container_name: twitgallery_db
