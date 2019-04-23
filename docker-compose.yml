@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+    web:
+        container_name: twitgallery_web
+        build: './web'
+        ports:
+            - 1024:80
+        restart: always
+    app:
+        container_name: twitgallery_app
+        depends_on:
+            - db
+        volumes:
+            - 'c:\dev\twitgallery\app\src:/usr/src/app'
+        build: './app'
+        restart: always
+    db:
+        container_name: twitgallery_db
+        environment:
+            - POSTGRES_USER=tg_user
+            - POSTGRES_PASSWORD=docker
+        build: './db'
+        restart: always
+
