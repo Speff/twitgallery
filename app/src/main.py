@@ -67,6 +67,10 @@ def search_user(screen_name=None):
                     pass
                 else:
                     pg_con.commit()
+            # TODO - Add timer before deleting user entry to prevent over-reloading
+            pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s""", (screen_name,))
+            pg_con.commit()
+
         pg_con.close()
 
     return True
