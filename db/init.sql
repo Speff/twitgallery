@@ -15,9 +15,9 @@ CREATE TABLE twitter_posts(
 CREATE TABLE user_favorites(
     screen_nme TEXT,
     post_id TEXT
-)
+);
 
 CREATE TABLE user_status(
     screen_name TEXT,
     status TEXT
-)
+);
