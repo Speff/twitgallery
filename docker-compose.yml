@@ -22,6 +22,7 @@ services:
         environment:
             - POSTGRES_USER=tg_user
             - POSTGRES_PASSWORD=docker
+            - POSTGRES_DB=twitgallery
         build: './db'
         restart: always
 
