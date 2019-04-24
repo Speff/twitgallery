@@ -14,7 +14,7 @@ class process_user(Resource):
         user_status_result = check_user_status(screen_name)
         if user_status_result == "db_error":
             user_status = "db connection error"
-            status_code = 500
+            status_code = 503
         else:
             user_status = user_status_result
             status_code = 202
