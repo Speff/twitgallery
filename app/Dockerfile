@@ -1,6 +1,6 @@
 FROM python:3-alpine
 
-EXPOSE 1028
+EXPOSE 5000
 
 RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 

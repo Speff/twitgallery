@@ -1,5 +1,5 @@
 FROM nginx:1-alpine
 
-COPY www /usr/share/nginx/html
+VOLUME c:\dev\twitgallery\web\www:/usr/share/nginx/html
 
 EXPOSE 80
