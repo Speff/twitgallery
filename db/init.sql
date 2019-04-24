@@ -21,3 +21,9 @@ CREATE TABLE user_status(
     screen_name TEXT,
     status TEXT
 );
+
+CREATE TABLE user_keys(
+    user TEXT,
+    access_token text,
+    access_token_secret text
+)

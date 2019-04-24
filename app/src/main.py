@@ -1,10 +1,16 @@
 import os
+import twitter
 import psycopg2
 from flask import Flask, request
 from flask_restful import Resource, Api
 
 app = Flask(__name__)
 api = Api(app)
+
+twit_api = twitter.Api(consumer_key=os.environ['CONSUMER_KEY'],
+                  consumer_secret=os.environ['CONSUMER_SECRET'],
+                  access_token_key=os.environ['ACCESS_TOKEN'],
+                  access_token_secret=os.environ['ACCESS_TOKEN_SECRET']);
 
 pg_connect_info = "dbname=twitgallery user=tg_user password=docker host=db"
 
@@ -27,8 +33,14 @@ class process_user(Resource):
 
 api.add_resource(process_user, '/process_user')
 
+def validate_searched_user(screen_name=None):
+    try:
+        timeline = twit_api.GetFavorites(screen_name=screen_name, count=1)
+    except: return False
+    else: return True
+
 def check_user_status(screen_name):
-    # Todo - validate screen_name before checking db
+    if validate_searched_user(screen_name) == False: return "user not found"
     try:
         pg_con = psycopg2.connect(pg_connect_info)
     except:
@@ -42,7 +54,7 @@ def check_user_status(screen_name):
             pg_cur.execute("""INSERT INTO user_status(screen_name, status) VALUES (%s, 'started')""", (screen_name,))
             pg_con.commit()
             pg_con.close()
-            return os.environ['CONSUMER_SECRET']
+            return "success"
         else:
             pg_con.close()
             return user_status[0]
