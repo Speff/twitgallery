@@ -9,7 +9,8 @@ CREATE TABLE twitter_posts(
     media_url_1 TEXT,
     media_url_2 TEXT,
     media_url_3 TEXT,
-    post_url TEXT
+    post_url TEXT,
+    possibly_sensitive TEXT
 );
 
 CREATE TABLE user_favorites(

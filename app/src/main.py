@@ -39,6 +39,48 @@ def validate_searched_user(screen_name=None):
     except: return False
     else: return True
 
+def search_user(screen_name=None):
+    print("Trying to connect to db")
+    try: pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        return False
+    else:
+        print("Connected to db. Trying to find " + screen_name + " favorites")
+        try:
+            favorites = twit_api.GetFavorites(screen_name=screen_name, include_entities=True, count=20)
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            print("Can't find favorites")
+            pg_cur = pg_con.cursor()
+            pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
+            pg_con.commit()
+            pg_con.close()
+            return False
+        else:
+            print("Found favorites")
+            pg_cur = pg_con.cursor()
+            for favorite in favorites:
+                pg_cur.execute("""INSERT INTO twitter_posts(post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s);""",(favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
+                print(favorite)
+                for index, media in enumerate(favorite.media):
+                    pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s;""",(media.media_url,)) 
+                    print("Posting " + media.media_url)
+            pg_con.commit()
+        pg_con.close()
+
+    try: pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        return False
+    else:
+        pg_cur = pg_con.cursor()
+        pg_cur.execute("""SELECT * FROM twitter_posts""")
+        for record in pg_cur:
+            print(record)
+        pg_con.close()
+
+    
+    return True
+
 def check_user_status(screen_name):
     if validate_searched_user(screen_name) == False: return "user not found"
     try:
@@ -54,11 +96,25 @@ def check_user_status(screen_name):
             pg_cur.execute("""INSERT INTO user_status(screen_name, status) VALUES (%s, 'started')""", (screen_name,))
             pg_con.commit()
             pg_con.close()
+            print("Looking for " + screen_name + " favorites")
+            search_user(screen_name)
             return "success"
         else:
             pg_con.close()
-            return user_status[0]
+            return "user already in db"
 
 
 if __name__ == '__main__':
+    try:
+        pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        print("db error")
+    else:
+        pg_cur = pg_con.cursor()
+        pg_cur.execute("""DELETE FROM user_status;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM twitter_posts;""")
+        pg_con.commit()
+        pg_con.close()
+    print("Started")
     app.run(host='0.0.0.0')

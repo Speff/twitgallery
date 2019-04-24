@@ -8,4 +8,4 @@ WORKDIR /usr/src/app
 
 RUN pip install --no-cache-dir psycopg2 config configparser flask flask_restful python-twitter
 
-CMD ["python", "./main.py"]
+CMD ["python", "-u","./main.py"]
