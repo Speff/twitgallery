@@ -11,7 +11,8 @@ api = Api(app)
 twit_api = twitter.Api(consumer_key=os.environ['CONSUMER_KEY'],
                   consumer_secret=os.environ['CONSUMER_SECRET'],
                   access_token_key=os.environ['ACCESS_TOKEN'],
-                  access_token_secret=os.environ['ACCESS_TOKEN_SECRET']);
+                  access_token_secret=os.environ['ACCESS_TOKEN_SECRET'],
+                  sleep_on_rate_limit=True);
 
 pg_connect_info = "dbname=twitgallery user=tg_user password=docker host=db"
 
@@ -46,7 +47,7 @@ def search_user(screen_name=None):
         return False
     else:
         try:
-            favorites = twit_api.GetFavorites(screen_name=screen_name, include_entities=True, count=20)
+            favorites = twit_api.GetFavorites(screen_name=screen_name, count=200)
         except:
             pg_cur = pg_con.cursor()
             pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
@@ -59,9 +60,13 @@ def search_user(screen_name=None):
                 create_time = datetime.strptime(favorite.created_at, '%a %b %d %H:%M:%S +0000 %Y')
                 str_create_time = create_time.strftime("%m/%d/%Y, %H:%M:%S")
                 pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s);""",(str_create_time, favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
-                for index, media in enumerate(favorite.media):
-                    pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s;""",(media.media_url,)) 
-            pg_con.commit()
+                try:
+                    for index, media in enumerate(favorite.media):
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s;""",(media.media_url,)) 
+                except:
+                    pass
+                else:
+                    pg_con.commit()
         pg_con.close()
 
     return True
