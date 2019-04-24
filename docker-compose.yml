@@ -16,6 +16,7 @@ services:
             - db
         volumes:
             - 'c:\dev\twitgallery\app\src:/usr/src/app'
+        env_file: app.env
         restart: always
     db:
         container_name: twitgallery_db

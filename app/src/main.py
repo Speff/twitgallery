@@ -1,3 +1,4 @@
+import os
 import psycopg2
 from flask import Flask, request
 from flask_restful import Resource, Api
@@ -41,7 +42,7 @@ def check_user_status(screen_name):
             pg_cur.execute("""INSERT INTO user_status(screen_name, status) VALUES (%s, 'started')""", (screen_name,))
             pg_con.commit()
             pg_con.close()
-            return "started"
+            return os.environ['CONSUMER_SECRET']
         else:
             pg_con.close()
             return user_status[0]
