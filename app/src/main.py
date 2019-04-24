@@ -27,6 +27,7 @@ class process_user(Resource):
 api.add_resource(process_user, '/process_user')
 
 def check_user_status(screen_name):
+    # Todo - validate screen_name before checking db
     try:
         pg_con = psycopg2.connect(pg_connect_info)
     except:
