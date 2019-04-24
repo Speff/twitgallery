@@ -5,12 +5,13 @@ app = Flask(__name__)
 api = Api(app)
 
 class process_user(Resource):
-    def get(self, user_id):
-        print("Returning value")
-        ret = user_id + " accepted"
-        return {"status": user_id}, 202 # Accepted user
+    def post(self):
+        return {
+                "status": "processing",
+                "user_id": request.form["user_id"]
+                }, 202
 
-api.add_resource(process_user, '/process_user/<string:user_id>')
+api.add_resource(process_user, '/process_user')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
