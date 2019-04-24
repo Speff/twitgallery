@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 import twitter
 import psycopg2
 from flask import Flask, request
@@ -40,45 +41,29 @@ def validate_searched_user(screen_name=None):
     else: return True
 
 def search_user(screen_name=None):
-    print("Trying to connect to db")
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
         return False
     else:
-        print("Connected to db. Trying to find " + screen_name + " favorites")
         try:
             favorites = twit_api.GetFavorites(screen_name=screen_name, include_entities=True, count=20)
         except:
-            print("Unexpected error:", sys.exc_info()[0])
-            print("Can't find favorites")
             pg_cur = pg_con.cursor()
             pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
             pg_con.commit()
             pg_con.close()
             return False
         else:
-            print("Found favorites")
             pg_cur = pg_con.cursor()
             for favorite in favorites:
-                pg_cur.execute("""INSERT INTO twitter_posts(post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s);""",(favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
-                print(favorite)
+                create_time = datetime.strptime(favorite.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+                str_create_time = create_time.strftime("%m/%d/%Y, %H:%M:%S")
+                pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s);""",(str_create_time, favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
                 for index, media in enumerate(favorite.media):
                     pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s;""",(media.media_url,)) 
-                    print("Posting " + media.media_url)
             pg_con.commit()
         pg_con.close()
 
-    try: pg_con = psycopg2.connect(pg_connect_info)
-    except:
-        return False
-    else:
-        pg_cur = pg_con.cursor()
-        pg_cur.execute("""SELECT * FROM twitter_posts""")
-        for record in pg_cur:
-            print(record)
-        pg_con.close()
-
-    
     return True
 
 def check_user_status(screen_name):
@@ -96,7 +81,6 @@ def check_user_status(screen_name):
             pg_cur.execute("""INSERT INTO user_status(screen_name, status) VALUES (%s, 'started')""", (screen_name,))
             pg_con.commit()
             pg_con.close()
-            print("Looking for " + screen_name + " favorites")
             search_user(screen_name)
             return "success"
         else:
