@@ -91,7 +91,7 @@ def search_user(screen_name=None):
                 pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s)""", (screen_name, favorite.id_str))
                 try:
                     for index, media in enumerate(favorite.media):
-                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s;""",(media.media_url,)) 
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s WHERE post_id=%s;""",(media.media_url,favorite.id_str)) 
                 except:
                     pass
                 else:
