@@ -24,7 +24,7 @@ CREATE TABLE user_status(
 );
 
 CREATE TABLE user_keys(
-    user TEXT,
-    access_token text,
-    access_token_secret text
-)
+    session_user TEXT,
+    access_token TEXT,
+    access_token_secret TEXT
+);
