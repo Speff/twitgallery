@@ -6,6 +6,8 @@ services:
         build: './web'
         ports:
             - 1024:80
+        volumes:
+            - 'c:\dev\twitgallery\web\www:/usr/share/nginx/html'
         restart: always
     app:
         container_name: twitgallery_app

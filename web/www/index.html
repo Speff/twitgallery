@@ -9,9 +9,9 @@
         <div id='target'></div>
         <script>
             $(document).ready(function(){
-                $.get("http://127.0.0.1:5000/test", function(data, status){
+                $.post("http://localhost:5000/get_results", {"screen_name": "@speff7"}, function(data, status){
                     $("#target").text(data);
-                });
+                }, "json");
             });
         </script>
     </body>

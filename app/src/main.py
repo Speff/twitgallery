@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import twitter
 import psycopg2
+from psycopg2.extras import RealDictCursor
 from flask import Flask, request
 from flask_restful import Resource, Api
 
@@ -33,8 +34,8 @@ class process_user(Resource):
                 "user_id": screen_name
                 }, status_code
 
-class get_user(Resource):
-    def get(self):
+class get_results(Resource):
+    def post(self):
         screen_name = request.form["user_id"]
 
         user_status_result = get_user(screen_name)
@@ -51,7 +52,7 @@ class get_user(Resource):
                 }, status_code
 
 api.add_resource(process_user, '/process_user')
-api.add_resource(get_user, '/get_results')
+api.add_resource(get_results, '/get_results')
 
 def validate_searched_user(screen_name=None):
     try:
@@ -64,10 +65,11 @@ def get_user(screen_name=None):
     except:
         return {"status": "failed"}
     else:
-        pg_cur = pg_con.cursor()
-        pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
-
-
+        pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
+        pg_cur.execute("""SELECT media_url_0, media_url_1, media_url_2, media_url_3 FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL;""", (screen_name,))
+        ret = pg_cur.fetchall()
+        pg_con.close()
+        return ret
 
 def search_user(screen_name=None):
     try: pg_con = psycopg2.connect(pg_connect_info)
@@ -136,6 +138,8 @@ if __name__ == '__main__':
     else:
         pg_cur = pg_con.cursor()
         pg_cur.execute("""DELETE FROM user_status;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM user_favorites;""")
         pg_con.commit()
         pg_cur.execute("""DELETE FROM twitter_posts;""")
         pg_con.commit()
