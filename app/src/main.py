@@ -33,13 +33,41 @@ class process_user(Resource):
                 "user_id": screen_name
                 }, status_code
 
+class get_user(Resource):
+    def get(self):
+        screen_name = request.form["user_id"]
+
+        user_status_result = check_user_status(screen_name)
+        if user_status_result == "db_error":
+            user_status = "db connection error"
+            status_code = 503
+        else:
+            user_status = user_status_result
+            status_code = 202
+
+        return {
+                "status": user_status,
+                "user_id": screen_name
+                }, status_code
+
 api.add_resource(process_user, '/process_user')
+api.add_resource(get_user, '/get_results')
 
 def validate_searched_user(screen_name=None):
     try:
         timeline = twit_api.GetFavorites(screen_name=screen_name, count=1)
     except: return False
     else: return True
+
+def get_user(screen_name=None):
+    try: pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        return {"status": "failed"}
+    else:
+        pg_cur = pg_con.cursor()
+        pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
+
+
 
 def search_user(screen_name=None):
     try: pg_con = psycopg2.connect(pg_connect_info)
@@ -68,6 +96,8 @@ def search_user(screen_name=None):
                 else:
                     pg_con.commit()
             # TODO - Add timer before deleting user entry to prevent over-reloading
+            # TODO - Handle duplicates
+            # TODO - async this function
             pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s""", (screen_name,))
             pg_con.commit()
 

@@ -14,7 +14,7 @@ CREATE TABLE twitter_posts(
 );
 
 CREATE TABLE user_favorites(
-    screen_nme TEXT,
+    screen_name TEXT,
     post_id TEXT
 );
 
