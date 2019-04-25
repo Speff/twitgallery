@@ -24,6 +24,8 @@ services:
             - POSTGRES_USER=tg_user
             - POSTGRES_PASSWORD=docker
             - POSTGRES_DB=twitgallery
+        ports:
+            - 5432:5432
         build: './db'
         restart: always
 

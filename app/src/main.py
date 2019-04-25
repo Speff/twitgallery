@@ -37,7 +37,7 @@ class get_user(Resource):
     def get(self):
         screen_name = request.form["user_id"]
 
-        user_status_result = check_user_status(screen_name)
+        user_status_result = get_user(screen_name)
         if user_status_result == "db_error":
             user_status = "db connection error"
             status_code = 503
