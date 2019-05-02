@@ -1,0 +1,22 @@
+server {
+    listen 80 default_server;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+
+    location ~ /api/(?<qry>.*) {
+        proxy_pass http://app:5000/$qry;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}

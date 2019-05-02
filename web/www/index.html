@@ -1,18 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title> TwitGallery </title>
-        <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+        <meta charset="UTF-8">
+        <title>TwitGallery</title>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        Start 3
-        <div id='target'></div>
-        <script>
-            $(document).ready(function(){
-                $.post("http://localhost:5000/get_results", {"screen_name": "@speff7"}, function(data, status){
-                    $("#target").text(data);
-                }, "json");
-            });
-        </script>
+        <div id="target"></div>
+        <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+        <script src="main.js"></script>
     </body>
 </html>
