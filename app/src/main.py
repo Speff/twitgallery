@@ -89,8 +89,8 @@ def search_user(screen_name=None):
             for favorite in favorites:
                 create_time = datetime.strptime(favorite.created_at, '%a %b %d %H:%M:%S +0000 %Y')
                 str_create_time = create_time.strftime("%m/%d/%Y, %H:%M:%S")
-                pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s);""",(str_create_time, favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
-                pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s)""", (screen_name, favorite.id_str))
+                pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;""",(str_create_time, favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
+                pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s) ON CONFLICT DO NOTHING""", (screen_name, favorite.id_str))
                 try:
                     for index, media in enumerate(favorite.media):
                         pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s WHERE post_id=%s;""",(media.media_url,favorite.id_str)) 

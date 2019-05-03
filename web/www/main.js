@@ -1,5 +1,5 @@
 function main(){
-    $(document).ready(function(){
+   //.post("/api/process_user", {"user_id": "@speff7"}, function(data, status){
         $.post("/api/get_results", {"user_id": "@speff7"}, function(data, status){
             $("#target").append("<div class='post_row'>");
             $("#target").append("<div class='post_col'>");
@@ -20,8 +20,11 @@ function main(){
             $("#target").append("</div>");
             $("#target").append("</div>");
         }, "json");
-    });
+    //});
 }
 
-main();
+$(document).ready(function(){
+    $("#user_input").val("@speff7");
+    main();
+});
 

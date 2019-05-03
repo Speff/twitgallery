@@ -10,12 +10,14 @@ CREATE TABLE twitter_posts(
     media_url_2 TEXT,
     media_url_3 TEXT,
     post_url TEXT,
-    possibly_sensitive TEXT
+    possibly_sensitive TEXT,
+    UNIQUE(post_id)
 );
 
 CREATE TABLE user_favorites(
     screen_name TEXT,
-    post_id TEXT
+    post_id TEXT,
+    UNIQUE(screen_name, post_id)
 );
 
 CREATE TABLE user_status(
@@ -24,7 +26,7 @@ CREATE TABLE user_status(
 );
 
 CREATE TABLE user_keys(
-    session_user TEXT,
+    session_current_user TEXT,
     access_token TEXT,
     access_token_secret TEXT
 );
