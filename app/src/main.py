@@ -94,12 +94,13 @@ def search_user(screen_name=None):
                 try:
                     for index, media in enumerate(favorite.media):
                         pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s WHERE post_id=%s;""",(media.media_url,favorite.id_str)) 
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""_size_x=%s WHERE post_id=%s;""",(media.media_url.sizes.large.w,favorite.id_str)) 
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""_size_y=%s WHERE post_id=%s;""",(media.media_url.sizes.large.h,favorite.id_str)) 
                 except:
                     pass
                 else:
                     pg_con.commit()
             # TODO - Add timer before deleting user entry to prevent over-reloading
-            # TODO - Handle duplicates
             # TODO - async this function
             pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s""", (screen_name,))
             pg_con.commit()
