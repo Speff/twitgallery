@@ -63,10 +63,10 @@ def validate_searched_user(screen_name=None):
 def get_user(screen_name=None):
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
-        return {"status": "failed"}
+        return "db_error"
     else:
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
-        pg_cur.execute("""SELECT media_url_0, media_url_1, media_url_2, media_url_3 FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL;""", (screen_name,))
+        pg_cur.execute("""SELECT media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL;""", (screen_name,))
         ret = pg_cur.fetchall()
         pg_con.close()
         return ret
