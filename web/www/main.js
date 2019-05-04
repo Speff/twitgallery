@@ -23,7 +23,7 @@ function display_images(user){
         $('#grid_01').packery({
             // options
             itemSelector: '.grid-item',
-            stagger: 5
+            stagger: 5,
         });
     }, "json");
 }
