@@ -62,6 +62,7 @@ $(document).keyup(function(e) {
 $(document).ready(function(){
     $("#user_input").val("@speff7");
     $("#process_user_input").click(function(){
+        $("#process_user_result").empty();
         var user_to_process = $("#user_input").val();
         $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
             console.log(status);
