@@ -14,21 +14,29 @@ function display_images(user){
                     post_html += "</div>";
                     $("#grid_01").append(post_html);
 
+                    var new_element = $("#post_"+image_count);
+
                     var orig_size_x = value["media_url_"+i+"_size_x"];
                     var orig_size_y = value["media_url_"+i+"_size_y"];
                     var AR = orig_size_x / orig_size_y;
-
                     orig_size_x = orig_size_x*0.25;
                     orig_size_y = orig_size_y*0.25;
-
                     var scaled_size_x = Math.round(orig_size_x/64.0)*64.0;
                     var scaled_size_y = scaled_size_x / AR;
 
-                    $("#post_"+image_count).css("width", scaled_size_x);
-                    $("#post_"+image_count).css("height", scaled_size_y);
+                    new_element.css("width", scaled_size_x);
+                    new_element.css("height", scaled_size_y);
+
+                    new_element.attr("data-"+"created_at", value["created_at"]);
+                    new_element.attr("data-"+"user_favorites.post_id", value["user_favorites.post_id"]);
+                    new_element.attr("data-"+"text", value["text"]);
+                    new_element.attr("data-"+"name", value["name"]);
+                    new_element.attr("data-"+"user_favorites.screen_name", value["user_favorites.screen_name"]);
+                    new_element.attr("data-"+"profile_image_url", value["profile_image_url"]);
+                    new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
 
                     var img_src = "<img src='"+value["media_url_"+i]+"'></img>";
-                    $("#post_"+image_count).click({"img_src": img_src}, display_modal);
+                    new_element.click({"img_src": img_src}, display_modal);
                     image_count += 1;
                 }
             }
