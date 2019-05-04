@@ -13,7 +13,7 @@ function display_images(user){
                     post_html += "<img class='blur_image' src='" + value["media_url_"+i] + "'></img>";
                     post_html += "</div>";
                     $("#grid_01").append(post_html);
-                    
+
                     var orig_size_x = value["media_url_"+i+"_size_x"];
                     var orig_size_y = value["media_url_"+i+"_size_y"];
                     var AR = orig_size_x / orig_size_y;
@@ -27,6 +27,8 @@ function display_images(user){
                     $("#post_"+image_count).css("width", scaled_size_x);
                     $("#post_"+image_count).css("height", scaled_size_y);
 
+                    var img_src = "<img src='"+value["media_url_"+i]+"'></img>";
+                    $("#post_"+image_count).click({"img_src": img_src}, display_modal);
                     image_count += 1;
                 }
             }
@@ -40,6 +42,22 @@ function display_images(user){
         });
     }, "json");
 }
+
+function display_modal(input){
+    console.log(input.data.img_src);
+    $("#modal_fs").show();
+    $("#picture_fs").html(input.data.img_src);
+};
+
+$(document).click(function(e){
+    if(e.target == $("#modal_fs")[0]){
+        $("#modal_fs").hide();
+    }
+});
+
+$(document).keyup(function(e) {
+    if(e.key == "Escape") $("#modal_fs").hide();
+});
 
 $(document).ready(function(){
     $("#user_input").val("@speff7");
