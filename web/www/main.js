@@ -8,11 +8,24 @@ function display_images(user){
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
-                    var post_html = "<div id='post_"+image_count+"' class='grid-item'><img src='" + value["media_url_"+i] + "'></img></div>";
+                    var post_html = "<div id='post_"+image_count+"' class='grid-item'>";
+                    post_html += "<img class='main_image' src='" + value["media_url_"+i] + "'></img>";
+                    post_html += "<img class='blur_image' src='" + value["media_url_"+i] + "'></img>";
+                    post_html += "</div>";
                     $("#grid_01").append(post_html);
+                    
+                    var orig_size_x = value["media_url_"+i+"_size_x"];
+                    var orig_size_y = value["media_url_"+i+"_size_y"];
+                    var AR = orig_size_x / orig_size_y;
 
-                    $("#post_"+image_count).css("width", 0.3*(value["media_url_"+i+"_size_x"]));
-                    $("#post_"+image_count).css("height", 0.3*(value["media_url_"+i+"_size_y"]));
+                    orig_size_x = orig_size_x*0.25;
+                    orig_size_y = orig_size_y*0.25;
+
+                    var scaled_size_x = Math.round(orig_size_x/64.0)*64.0;
+                    var scaled_size_y = scaled_size_x / AR;
+
+                    $("#post_"+image_count).css("width", scaled_size_x);
+                    $("#post_"+image_count).css("height", scaled_size_y);
 
                     image_count += 1;
                 }
