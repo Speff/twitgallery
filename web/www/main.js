@@ -8,11 +8,11 @@ function display_images(user){
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
-                    var post_html = "<div class='grid-item grid-item-'><img src='" + value["media_url_"+i] + "'></img></div>";
+                    var post_html = "<div id='post_"+image_count+"' class='grid-item'><img src='" + value["media_url_"+i] + "'></img></div>";
                     $("#grid_01").append(post_html);
 
-                    $("#post_"+image_count).css("width", 0.3*parseFloat(value["media_url_"+i+"_size_x"]));
-                    $("#post_"+image_count).css("height", 0.3*parseFloat(value["media_url_"+i+"_size_y"]));
+                    $("#post_"+image_count).css("width", 0.3*(value["media_url_"+i+"_size_x"]));
+                    $("#post_"+image_count).css("height", 0.3*(value["media_url_"+i+"_size_y"]));
 
                     image_count += 1;
                 }
@@ -20,12 +20,10 @@ function display_images(user){
             if(index > 20) return false;
         });
 
-        $('#grid_01').masonry({
+        $('#grid_01').packery({
             // options
             itemSelector: '.grid-item',
-            columnWidth: 1000,
-            horizontalOrder: true,
-            fitWidth: true
+            stagger: 5
         });
     }, "json");
 }
