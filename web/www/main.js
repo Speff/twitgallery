@@ -2,24 +2,31 @@ function display_images(user){
     $.post("/api/get_results", {"user_id": user}, function(data, status){
         $("#target").empty();
 
-        $("#target").append("<div class='post_row'>");
-        $("#target").append("<div class='post_col'>");
-        var n_posted = 0;
+        $("#target").html("<div id='grid_01' class='grid'></div>");
+
+        var image_count = 0;
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
-                    $("#target").append("<img src='"+value["media_url_"+i]+"' class='post'></img>");
-                    n_posted = n_posted + 1;
-                    if(n_posted % 6 == 0){
-                        $("#target").append("</div><div class='post_col'>");
-                    }
+                    var post_html = "<div class='grid-item grid-item-'><img src='" + value["media_url_"+i] + "'></img></div>";
+                    $("#grid_01").append(post_html);
+
+                    $("#post_"+image_count).css("width", 0.3*parseFloat(value["media_url_"+i+"_size_x"]));
+                    $("#post_"+image_count).css("height", 0.3*parseFloat(value["media_url_"+i+"_size_y"]));
+
+                    image_count += 1;
                 }
             }
-
-            if(index > 100) return false;
+            if(index > 20) return false;
         });
-        $("#target").append("</div>");
-        $("#target").append("</div>");
+
+        $('#grid_01').masonry({
+            // options
+            itemSelector: '.grid-item',
+            columnWidth: 1000,
+            horizontalOrder: true,
+            fitWidth: true
+        });
     }, "json");
 }
 

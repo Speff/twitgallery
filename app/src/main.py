@@ -93,10 +93,15 @@ def search_user(screen_name=None):
                 pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s) ON CONFLICT DO NOTHING""", (screen_name, favorite.id_str))
                 try:
                     for index, media in enumerate(favorite.media):
-                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s WHERE post_id=%s;""",(media.media_url,favorite.id_str)) 
-                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""_size_x=%s WHERE post_id=%s;""",(media.media_url.sizes.large.w,favorite.id_str)) 
-                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""_size_y=%s WHERE post_id=%s;""",(media.media_url.sizes.large.h,favorite.id_str)) 
-                except:
+                        media_url = media.media_url
+                        id_str = favorite.id_str
+                        media_url_size_x = media.sizes['large']['w']
+                        media_url_size_y = media.sizes['large']['h']
+
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""=%s WHERE post_id=%s;""",(media_url, id_str)) 
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""_size_x=%s WHERE post_id=%s;""",(media_url_size_x, id_str)) 
+                        pg_cur.execute("""UPDATE twitter_posts SET media_url_"""+str(index)+"""_size_y=%s WHERE post_id=%s;""",(media_url_size_y, id_str)) 
+                except Exception as e:
                     pass
                 else:
                     pg_con.commit()
