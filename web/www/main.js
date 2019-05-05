@@ -141,10 +141,11 @@ $(document).ready(function(){
         no_more_images = false;
     });
     $("#input").dblclick(function(e){
-        console.log("Doubleclicked");
-        //$("#user_input").focus();
-        $("#user_input").select();
-        $("#user_input").focus();
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents($("#user_input").get(0));
+        selection.removeAllRanges();
+        selection.addRange(range);
     });
 });
 
