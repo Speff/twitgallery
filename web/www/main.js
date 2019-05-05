@@ -34,9 +34,10 @@ function display_images(user){
                     new_element.attr("data-"+"user_favorites.screen_name", value["user_favorites.screen_name"]);
                     new_element.attr("data-"+"profile_image_url", value["profile_image_url"]);
                     new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
+                    new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+"'></img>");
 
-                    var img_src = "<img src='"+value["media_url_"+i]+"'></img>";
-                    new_element.click({"img_src": img_src}, display_modal);
+                    var img_src = 
+                    new_element.click({"tag": new_element}, display_modal);
                     image_count += 1;
                 }
             }
@@ -52,9 +53,11 @@ function display_images(user){
 }
 
 function display_modal(input){
-    console.log(input.data.img_src);
+    current_post = input.data.tag[0].attributes;
+    console.log(current_post["data-image"].nodeValue);
     $("#modal_fs").show();
-    $("#picture_fs").html(input.data.img_src);
+    $("#picture_data").html("Test data");
+    $("#picture_fs").append(current_post["data-image"].nodeValue);
 };
 
 $(document).click(function(e){
