@@ -117,6 +117,8 @@ button {
     margin-bottom: 0px;
 }
 #picture_data h5{
+    font-size: 16px;
+    font-weight: lighter;
     margin-top: 5px;
 }
 #picture_data a{
