@@ -142,7 +142,12 @@ $(document).ready(function(){
     });
     $("#input").click(function(){
         $("#user_input").focus();
-        $("#input").css({"border": "#FFFFFF"});
+        $("#input").css({"transition": "all 0.1s", "border-bottom": "1px solid #aaaaaa"});
+        $("#input").css({"border-right": "1px solid #aaaaaa"});
+    });
+    $("#user_input").focusout(function(){
+        $("#input").css({"transition": "all 0.1s", "border-bottom": "1px solid transparent"});
+        $("#input").css({"border-right": "1px solid transparent"});
     });
     $("#input").dblclick(function(e){
         var selection = window.getSelection();

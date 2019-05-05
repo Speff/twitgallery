@@ -42,12 +42,13 @@ hr{
 
 #input{
     background-color: #5a5a5a;
-    border: none;
+    border: 1px solid transparent;
     line-height: 32px;
     font-size: 24px;
     text-align: center;
     margin: auto;
     margin-top: 15px;
+    margin-bottom: 5px;
     width: 400px;
     height: 32px;
 }
