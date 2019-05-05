@@ -108,6 +108,7 @@ $(document).ready(function(){
     $("#user_input").val("@speff7");
     $("#process_user_input").click(function(){
         if(query_in_progress == false){
+            offset = 0;
             query_in_progress = true;
             $("#process_user_result").text("Processing User");
             var user_to_process = $("#user_input").val();
