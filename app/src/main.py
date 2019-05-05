@@ -66,7 +66,7 @@ def get_user(screen_name=None):
         return "db_error"
     else:
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
-        pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY user_favorites.post_id ASC;""", (screen_name,))
+        pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_favorites.post_id::bigint) DESC;""", (screen_name,))
         ret = pg_cur.fetchall()
         pg_con.close()
         return ret

@@ -5,6 +5,7 @@ function display_images(user){
         $("#target").html("<div id='grid_01' class='grid'></div>");
 
         var image_count = 0;
+        console.log(data);
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
@@ -23,6 +24,8 @@ function display_images(user){
                     var mod_orig_size_y = orig_size_y*0.25;
                     var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
                     var scaled_size_y = scaled_size_x / AR;
+
+                    console.log(value);
 
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
