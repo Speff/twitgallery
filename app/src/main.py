@@ -41,13 +41,15 @@ class get_results(Resource):
 
         user_status_result = get_user(screen_name, offset)
 
-        status_code = 202
-
         if user_status_result == "no more results":
+            user_status = user_status_result
             status_code = 204
-        else: user_status_result == "db_error":
+        elif user_status_result == "db_error":
             user_status = "db connection error"
             status_code = 503
+        else:
+            user_status = user_status_result
+            status_code = 202
 
         return {
                 "status": user_status,

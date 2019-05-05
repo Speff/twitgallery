@@ -1,6 +1,6 @@
 var offset = 0;
 var image_count = 0;
-var query_in_progress = 0;
+var query_in_progress = false;
 
 function display_images(user){
     $.post("/api/get_results", {"user_id": user, "offset": offset}, function(data, status){
@@ -116,7 +116,8 @@ $(document).ready(function(){
         else; // Do nothing. There's already a query in progress
     });
     $("#get_user_images").click(function(){
-        if(query_in_progress = false){
+        console.log(query_in_progress);
+        if(query_in_progress == false){
             query_in_progress = true;
             var user_to_process = $("#user_input").val();
             display_images(user_to_process);
