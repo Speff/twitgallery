@@ -96,6 +96,8 @@ button {
 
 /* Modal Content/Box */
 .modal_content {
+    animation-name: zoom;
+    animation-duration: 0.1s;
     margin: auto;
     z-index: 999;
 }
@@ -104,6 +106,11 @@ button {
     position: absolute;
     margin: auto;
     opacity: 1.0;
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
 }
 
 #picture_data{

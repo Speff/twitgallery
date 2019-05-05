@@ -5,7 +5,6 @@ function display_images(user){
         $("#target").html("<div id='grid_01' class='grid'></div>");
 
         var image_count = 0;
-        console.log(data);
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
@@ -25,7 +24,6 @@ function display_images(user){
                     var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
                     var scaled_size_y = scaled_size_x / AR;
 
-                    console.log(value);
 
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
@@ -61,7 +59,6 @@ function display_images(user){
 
 function display_modal(input){
     current_post = input.data.tag[0].attributes;
-    console.log(current_post["data-image"].nodeValue);
     $("#modal_fs").show();
     $(".modal_content").css("width", current_post["data-width"].nodeValue);
 
@@ -86,7 +83,6 @@ $(document).ready(function(){
         $("#process_user_result").empty();
         var user_to_process = $("#user_input").val();
         $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
-            console.log(status);
             if(status == "success"){
                 $("#process_user_result").text("User processed successfully");
             }
