@@ -1,19 +1,22 @@
 var offset = 0;
 var image_count = 0;
 var query_in_progress = false;
+var no_more_images = false;
+var search_user_changed = true;
 
 function display_images(user){
+    if(no_more_images) return false;
+
     $.post("/api/get_results", {"user_id": user, "offset": offset}, function(data, status){
         if(status != "success"){
-            $("#process_user_result").text("User processed successfully");
+            $("#end_results_target").text("End of images");
             query_in_progress = false;
+            no_more_images = true;
             return false;
         }
 
         offset += 1;
-        $("#target").empty();
-
-        $("#target").html("<div id='grid_01' class='grid'></div>");
+        $("#target").append("<div id='grid_" + offset + "' class='grid'></div>");
 
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
@@ -22,10 +25,11 @@ function display_images(user){
                     post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "<img class='blur_image' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "</div>";
-                    $("#grid_01").append(post_html);
+                    $("#grid_"+offset).append(post_html);
 
                     var new_element = $("#post_"+image_count);
 
+                    // Round grid sizes to minimize gaps
                     var orig_size_x = value["media_url_"+i+"_size_x"];
                     var orig_size_y = value["media_url_"+i+"_size_y"];
                     var AR = orig_size_x / orig_size_y;
@@ -33,8 +37,6 @@ function display_images(user){
                     var mod_orig_size_y = orig_size_y*0.25;
                     var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
                     var scaled_size_y = scaled_size_x / AR;
-
-
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
 
@@ -59,7 +61,7 @@ function display_images(user){
             }
         });
 
-        $('#grid_01').packery({
+        $('#grid_'+offset).packery({
             // options
             itemSelector: '.grid-item',
             stagger: 5,
@@ -91,7 +93,13 @@ $(document).keyup(function(e) {
 
 $(document).on("scroll", function(e){
     var scroll_pos = $(document).scrollTop() + $(window).height();
-    if($(document).height() - scroll_pos < 200) console.log("fetch next");
+    if($(document).height() - scroll_pos < 200){
+        if(query_in_progress == false){
+            query_in_progress = true;
+            var user_to_process = $("#user_input").val();
+            display_images(user_to_process);
+        }
+    }
 });
 
 $(document).ready(function(){
@@ -102,8 +110,6 @@ $(document).ready(function(){
             $("#process_user_result").empty();
             var user_to_process = $("#user_input").val();
             $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
-                console.log(data);
-                console.log(status);
                 query_in_progress = false;
                 if(status == "success"){
                     $("#process_user_result").text("User processed successfully");
@@ -116,12 +122,17 @@ $(document).ready(function(){
         else; // Do nothing. There's already a query in progress
     });
     $("#get_user_images").click(function(){
-        console.log(query_in_progress);
         if(query_in_progress == false){
+            if(search_user_changed) $("#target").empty();
+
             query_in_progress = true;
             var user_to_process = $("#user_input").val();
             display_images(user_to_process);
         }
+    });
+    $("#user_input").change(function(){
+        search_user_changed = true;
+        no_more_images = false;
     });
 });
 

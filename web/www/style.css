@@ -50,7 +50,8 @@ button {
   font-size: 16px;
 }
 
-#process_user_result{
+#process_user_result, #end_results_target{
+    text-align: center;
     color: #fafafa;
 }
 
