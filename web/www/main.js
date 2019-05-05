@@ -5,7 +5,10 @@ var no_more_images = false;
 var search_user_changed = true;
 
 function display_images(user){
-    if(no_more_images) return false;
+    if(no_more_images){
+        query_in_progress = false;
+        return false;
+    }
 
     $.post("/api/get_results", {"user_id": user, "offset": offset}, function(data, status){
         if(status != "success"){
