@@ -104,7 +104,6 @@ button {
 }
 
 .modal_content img{
-    position: absolute;
     margin: auto;
     opacity: 1.0;
 }

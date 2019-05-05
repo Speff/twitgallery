@@ -57,8 +57,7 @@ function display_images(user){
                     new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
                     new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+":large'></img>");
 
-                    var img_src = 
-                        new_element.click({"tag": new_element}, display_modal);
+                    var img_src = new_element.click({"tag": new_element}, display_modal);
                     image_count += 1;
                 }
             }
