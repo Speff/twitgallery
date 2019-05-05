@@ -9,8 +9,8 @@ function display_images(user){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
                     var post_html = "<div id='post_"+image_count+"' class='grid-item'>";
-                    post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + "'></img>";
-                    post_html += "<img class='blur_image' src='" + value["media_url_"+i] + "'></img>";
+                    post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + ":small'></img>";
+                    post_html += "<img class='blur_image' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "</div>";
                     $("#grid_01").append(post_html);
 
@@ -19,14 +19,18 @@ function display_images(user){
                     var orig_size_x = value["media_url_"+i+"_size_x"];
                     var orig_size_y = value["media_url_"+i+"_size_y"];
                     var AR = orig_size_x / orig_size_y;
-                    orig_size_x = orig_size_x*0.25;
-                    orig_size_y = orig_size_y*0.25;
-                    var scaled_size_x = Math.round(orig_size_x/64.0)*64.0;
+                    var mod_orig_size_x = orig_size_x*0.25;
+                    var mod_orig_size_y = orig_size_y*0.25;
+                    var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
                     var scaled_size_y = scaled_size_x / AR;
 
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
 
+                    new_element.attr("data-"+"width", orig_size_x);
+                    new_element.attr("data-"+"height", orig_size_y);
+                    new_element.attr("data-"+"orig_width", scaled_size_x);
+                    new_element.attr("data-"+"orig_height", scaled_size_y);
                     new_element.attr("data-"+"created_at", value["created_at"]);
                     new_element.attr("data-"+"user_favorites.post_id", value["user_favorites.post_id"]);
                     new_element.attr("data-"+"text", value["text"]);
@@ -34,7 +38,7 @@ function display_images(user){
                     new_element.attr("data-"+"user_favorites.screen_name", value["user_favorites.screen_name"]);
                     new_element.attr("data-"+"profile_image_url", value["profile_image_url"]);
                     new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
-                    new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+"'></img>");
+                    new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+":large'></img>");
 
                     var img_src = 
                     new_element.click({"tag": new_element}, display_modal);
@@ -56,6 +60,8 @@ function display_modal(input){
     current_post = input.data.tag[0].attributes;
     console.log(current_post["data-image"].nodeValue);
     $("#modal_fs").show();
+    $("#modal_content").css("width", current_post["data-width"].nodeValue);
+    console.log(current_post["data-width"].nodeValue);
     $("#picture_data").html("Test data");
     $("#picture_fs").html(current_post["data-image"].nodeValue);
 };
