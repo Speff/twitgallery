@@ -32,10 +32,11 @@ function display_images(user){
                     new_element.attr("data-"+"orig_width", scaled_size_x);
                     new_element.attr("data-"+"orig_height", scaled_size_y);
                     new_element.attr("data-"+"created_at", value["created_at"]);
-                    new_element.attr("data-"+"user_favorites.post_id", value["user_favorites.post_id"]);
+                    new_element.attr("data-"+"post_id", value["post_id"]);
+                    new_element.attr("data-"+"post_url", value["post_url"]);
                     new_element.attr("data-"+"text", value["text"]);
                     new_element.attr("data-"+"name", value["name"]);
-                    new_element.attr("data-"+"user_favorites.screen_name", value["user_favorites.screen_name"]);
+                    new_element.attr("data-"+"screen_name", value["screen_name"]);
                     new_element.attr("data-"+"profile_image_url", value["profile_image_url"]);
                     new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
                     new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+":large'></img>");
@@ -61,7 +62,9 @@ function display_modal(input){
     console.log(current_post["data-image"].nodeValue);
     $("#modal_fs").show();
     $(".modal_content").css("width", current_post["data-width"].nodeValue);
-    $("#picture_data").html("Test data");
+
+    $("#picture_data").html("<h4><a href='" + current_post["data-post_url"].nodeValue + "'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a></h4>");
+    $("#picture_data").append("<h5>" + current_post["data-text"].nodeValue + "</h5>");
     $("#picture_fs").html(current_post["data-image"].nodeValue);
 };
 

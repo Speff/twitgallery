@@ -113,6 +113,17 @@ button {
     opacity: 0.9;
 }
 
+#picture_data h4{
+    margin-bottom: 0px;
+}
+#picture_data h5{
+    margin-top: 5px;
+}
+#picture_data a{
+    color: inherit;
+    font-size: inherit;
+}
+
 .cover {
     -webkit-animation: 2s show;
     -moz-animation: 2s show;
