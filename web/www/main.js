@@ -49,7 +49,6 @@ function display_images(user){
                     image_count += 1;
                 }
             }
-            if(index > 20) return false;
         });
 
         $('#grid_01').packery({
