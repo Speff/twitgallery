@@ -133,7 +133,7 @@ $(document).ready(function(){
             display_images(user_to_process);
         }
     });
-    $("#user_input").change(function(){
+    $("#user_input").on('input', function(){
         search_user_changed = true;
         no_more_images = false;
     });
