@@ -78,7 +78,7 @@ function display_modal(input){
     $("#modal_fs").show();
     $(".modal_content").css("width", current_post["data-width"].nodeValue);
 
-    $("#picture_data").html("<h4><a href='" + current_post["data-post_url"].nodeValue + "'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a></h4>");
+    $("#picture_data").html("<h4><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a></h4>");
     $("#picture_data").append("<h5>" + current_post["data-text"].nodeValue + "</h5>");
     $("#picture_fs").html(current_post["data-image"].nodeValue);
 };
@@ -109,12 +109,13 @@ $(document).ready(function(){
     $("#process_user_input").click(function(){
         if(query_in_progress == false){
             query_in_progress = true;
-            $("#process_user_result").empty();
+            $("#process_user_result").text("Processing User");
             var user_to_process = $("#user_input").val();
             $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
                 query_in_progress = false;
                 if(status == "success"){
                     $("#process_user_result").text("User processed successfully");
+                    no_more_images = false;
                 }
                 else{
                     $("#process_user_result").text("User processing failed");
@@ -127,7 +128,9 @@ $(document).ready(function(){
         if(query_in_progress == false){
             if(search_user_changed) $("#target").empty();
 
+            search_user_changed = false;
             query_in_progress = true;
+
             var user_to_process = $("#user_input").val();
             display_images(user_to_process);
         }
