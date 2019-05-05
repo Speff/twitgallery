@@ -2,9 +2,12 @@ body{
     background-color: #0a0a0a;
     font-family: 'Noto Sans', sans-serif;
     overflow-x: hidden;
+    margin: 0px;
 }
 
 #header{
+    margin-top: 0px;
+    padding-top: 15px;
     background: #0a0a0a;
     z-index: 99;
     padding-bottom:10px;
@@ -20,18 +23,56 @@ h1{
     font-size: 48px;
 }
 
+hr{
+    border: 1px solid #5a5a5a;
+}
+
+.hr_line{ 
+    display:block;
+    border:none;
+    color:white;
+    height:1px;
+    background:black;
+    background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 600, from(#fff), to(#000));
+}
+
 #interactive_area{
     text-align: center;
 }
 
-input{
+#input{
     background-color: #5a5a5a;
     border: none;
     line-height: 32px;
     font-size: 24px;
-    text-align: center;
-    color: #fafafa;
     font-weight: normal;
+    text-align: center;
+    margin: auto;
+    margin-top: 15px;
+    color: #fafafa;
+    width: 400px;
+    height: 32px;
+}
+
+#user_input{
+    background-color: #5a5a5a;
+    border: none;
+    line-height: 30px;
+    font-size: 23px;
+    font-weight: normal;
+    text-align: center;
+    margin: auto;
+    color: #fafafa;
+    width: 350px;
+    height: 32px;
+}
+
+#at_symbol{
+    color: #cccccc;
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
 }
 
 #buttons{
@@ -53,6 +94,12 @@ button {
 #process_user_result, #end_results_target{
     text-align: center;
     color: #fafafa;
+}
+
+#target{
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 15px
 }
 
 #post{
@@ -164,6 +211,7 @@ button {
 }
 
 #footer{
+    margin-right: 8px;
     text-align: right;
     color: #999999;
 }

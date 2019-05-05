@@ -8,10 +8,10 @@
     </head>
     <body>
         <div id="header">
-            <h1>Twitter Favorites Gallery</h1>
             <div id="interactive_area">
                 <div id="input">
-                    <input id="user_input"></input>
+                    <span id="at_symbol">@</span>
+                    <span id="user_input" contenteditable="true"></span>
                 </div>
                 <div id="buttons">
                     <button id="process_user_input">Process User</button>
@@ -19,7 +19,7 @@
                 </div>
                 <div id="process_user_result"></div>
             </div>
-            <hr>
+            <span class="hr_line">
         </div>
 
         <div id="modal_fs" class="modal">
@@ -32,6 +32,7 @@
         </div>
 
         <div id="target"> </div>
+        <span class="hr_line">
         <div id="end_results_target"></div>
         <div id="footer">/u/Speff</div>
 

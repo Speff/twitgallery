@@ -98,20 +98,20 @@ $(document).on("scroll", function(e){
     if($(document).height() - scroll_pos < 200){
         if(query_in_progress == false){
             query_in_progress = true;
-            var user_to_process = $("#user_input").val();
+            var user_to_process = "@" + $("#user_input").text();
             display_images(user_to_process);
         }
     }
 });
 
 $(document).ready(function(){
-    $("#user_input").val("@speff7");
+    $("#user_input").text("speff7");
     $("#process_user_input").click(function(){
         if(query_in_progress == false){
             offset = 0;
             query_in_progress = true;
             $("#process_user_result").text("Processing User");
-            var user_to_process = $("#user_input").val();
+            var user_to_process = "@" + $("#user_input").text();
             $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
                 query_in_progress = false;
                 if(status == "success"){
@@ -132,13 +132,19 @@ $(document).ready(function(){
             search_user_changed = false;
             query_in_progress = true;
 
-            var user_to_process = $("#user_input").val();
+            var user_to_process = "@" + $("#user_input").text();
             display_images(user_to_process);
         }
     });
-    $("#user_input").on('input', function(){
+    $("body").on('DOMSubtreeModified', "#user_input", function(){
         search_user_changed = true;
         no_more_images = false;
+    });
+    $("#input").dblclick(function(e){
+        console.log("Doubleclicked");
+        //$("#user_input").focus();
+        $("#user_input").select();
+        $("#user_input").focus();
     });
 });
 
