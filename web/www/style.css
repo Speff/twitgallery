@@ -13,7 +13,7 @@ body{
 h1{
     padding-top: 15px;
     text-align: center;
-    color: #fafafa;
+    color: #f7f7f7;
     font-weight: lighter;
     margin-top: 15px;
     margin-bottom: 10px;
@@ -27,15 +27,27 @@ h1{
 input{
     background-color: #5a5a5a;
     border: none;
-    line-height: 24px;
+    line-height: 32px;
     font-size: 24px;
     text-align: center;
     color: #fafafa;
+    font-weight: normal;
 }
 
 #buttons{
     padding-top: 10px;
     padding-bottom: 15px;
+}
+
+button {
+  background-color: #e7e7e7; /* Green */
+  border: none;
+  color: black;
+  padding: 5px 27px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
 }
 
 #process_user_result{
@@ -97,4 +109,34 @@ input{
 
 #picture_data{
     color: #fafafa;
+}
+
+.cover {
+    -webkit-animation: 2s show;
+    -moz-animation: 2s show;
+    -ms-animation: 2s show;
+    animation: 2s show;
+
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-fill-mode: forwards;
+    -ms-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+
+}
+
+@-webkit-keyframes show {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+@-moz-keyframes show {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+@-ms-keyframes show {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+@keyframes show {
+    from { opacity: 0 }
+    to { opacity: 1 }
 }

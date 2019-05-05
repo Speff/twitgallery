@@ -9,7 +9,7 @@ function display_images(user){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
                     var post_html = "<div id='post_"+image_count+"' class='grid-item'>";
-                    post_html += "<img class='main_image' src='" + value["media_url_"+i] + "'></img>";
+                    post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + "'></img>";
                     post_html += "<img class='blur_image' src='" + value["media_url_"+i] + "'></img>";
                     post_html += "</div>";
                     $("#grid_01").append(post_html);
@@ -57,7 +57,7 @@ function display_modal(input){
     console.log(current_post["data-image"].nodeValue);
     $("#modal_fs").show();
     $("#picture_data").html("Test data");
-    $("#picture_fs").append(current_post["data-image"].nodeValue);
+    $("#picture_fs").html(current_post["data-image"].nodeValue);
 };
 
 $(document).click(function(e){
