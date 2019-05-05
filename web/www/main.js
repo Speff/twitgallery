@@ -1,10 +1,20 @@
+var offset = 0;
+var image_count = 0;
+var query_in_progress = 0;
+
 function display_images(user){
-    $.post("/api/get_results", {"user_id": user}, function(data, status){
+    $.post("/api/get_results", {"user_id": user, "offset": offset}, function(data, status){
+        if(status != "success"){
+            $("#process_user_result").text("User processed successfully");
+            query_in_progress = false;
+            return false;
+        }
+
+        offset += 1;
         $("#target").empty();
 
         $("#target").html("<div id='grid_01' class='grid'></div>");
 
-        var image_count = 0;
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
@@ -43,7 +53,7 @@ function display_images(user){
                     new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+":large'></img>");
 
                     var img_src = 
-                    new_element.click({"tag": new_element}, display_modal);
+                        new_element.click({"tag": new_element}, display_modal);
                     image_count += 1;
                 }
             }
@@ -54,6 +64,8 @@ function display_images(user){
             itemSelector: '.grid-item',
             stagger: 5,
         });
+
+        query_in_progress = false;
     }, "json");
 }
 
@@ -77,23 +89,38 @@ $(document).keyup(function(e) {
     if(e.key == "Escape") $("#modal_fs").hide();
 });
 
+$(document).on("scroll", function(e){
+    var scroll_pos = $(document).scrollTop() + $(window).height();
+    if($(document).height() - scroll_pos < 200) console.log("fetch next");
+});
+
 $(document).ready(function(){
     $("#user_input").val("@speff7");
     $("#process_user_input").click(function(){
-        $("#process_user_result").empty();
-        var user_to_process = $("#user_input").val();
-        $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
-            if(status == "success"){
-                $("#process_user_result").text("User processed successfully");
-            }
-            else{
-                $("#process_user_result").text("User processing failed");
-            }
-        });
+        if(query_in_progress == false){
+            query_in_progress = true;
+            $("#process_user_result").empty();
+            var user_to_process = $("#user_input").val();
+            $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
+                console.log(data);
+                console.log(status);
+                query_in_progress = false;
+                if(status == "success"){
+                    $("#process_user_result").text("User processed successfully");
+                }
+                else{
+                    $("#process_user_result").text("User processing failed");
+                }
+            });
+        }
+        else; // Do nothing. There's already a query in progress
     });
     $("#get_user_images").click(function(){
-        var user_to_process = $("#user_input").val();
-        display_images(user_to_process);
+        if(query_in_progress = false){
+            query_in_progress = true;
+            var user_to_process = $("#user_input").val();
+            display_images(user_to_process);
+        }
     });
 });
 

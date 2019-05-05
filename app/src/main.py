@@ -37,14 +37,17 @@ class process_user(Resource):
 class get_results(Resource):
     def post(self):
         screen_name = request.form["user_id"]
+        offset = request.form["offset"]
 
-        user_status_result = get_user(screen_name)
-        if user_status_result == "db_error":
+        user_status_result = get_user(screen_name, offset)
+
+        status_code = 202
+
+        if user_status_result == "no more results":
+            status_code = 204
+        else: user_status_result == "db_error":
             user_status = "db connection error"
             status_code = 503
-        else:
-            user_status = user_status_result
-            status_code = 202
 
         return {
                 "status": user_status,
@@ -60,15 +63,27 @@ def validate_searched_user(screen_name=None):
     except: return False
     else: return True
 
-def get_user(screen_name=None):
+def get_user(screen_name=None, offset=0):
+    try: int(offset)
+    except:
+        print(isinstance(offset, int))
+        return "invalid offset"
+    else:
+        if int(offset) < 0:
+            return "invalid offset"
+        if int(offset) > 500:
+            return "offset too large"
+
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
         return "db_error"
     else:
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
-        pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET 0;""", (screen_name,))
+        pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
         ret = pg_cur.fetchall()
         pg_con.close()
+
+        if len(ret) == 0: return "no more results"
         return ret
 
 def search_user(screen_name=None):
