@@ -59,6 +59,7 @@ hr{
     height: 32px;
     color: #fafafa;
     font-weight: 500;
+    outline: none;
 }
 
 #at_symbol{
@@ -76,14 +77,14 @@ hr{
 }
 
 button {
-  background-color: #e7e7e7; /* Green */
-  border: none;
-  color: black;
-  padding: 5px 27px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
+    background-color: #e7e7e7; /* Green */
+    border: none;
+    color: black;
+    padding: 5px 27px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
 }
 
 #process_user_result, #end_results_target{

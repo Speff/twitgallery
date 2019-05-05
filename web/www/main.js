@@ -110,7 +110,7 @@ $(document).ready(function(){
         if(query_in_progress == false){
             offset = 0;
             query_in_progress = true;
-            $("#process_user_result").text("Processing User");
+            $("#process_user_result").text("Processing User...");
             var user_to_process = "@" + $("#user_input").text();
             $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
                 query_in_progress = false;
@@ -139,6 +139,10 @@ $(document).ready(function(){
     $("body").on('DOMSubtreeModified', "#user_input", function(){
         search_user_changed = true;
         no_more_images = false;
+    });
+    $("#input").click(function(){
+        $("#user_input").focus();
+        $("#input").css({"border": "#FFFFFF"});
     });
     $("#input").dblclick(function(e){
         var selection = window.getSelection();
