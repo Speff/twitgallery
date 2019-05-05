@@ -14,9 +14,9 @@ h1{
     padding-top: 15px;
     text-align: center;
     color: #f7f7f7;
-    font-weight: lighter;
     margin-top: 15px;
     margin-bottom: 10px;
+    font-weight: lighter;
     font-size: 48px;
 }
 
@@ -91,6 +91,7 @@ button {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 /* Modal Content/Box */
@@ -106,7 +107,10 @@ button {
 }
 
 #picture_data{
+    font-weight: lighter;
+    font-size: 24px;
     color: #fafafa;
+    opacity: 0.9;
 }
 
 .cover {
