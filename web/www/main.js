@@ -73,7 +73,7 @@ function display_images(user){
             }
         });
 
-        console.log("sorting");
+        // Sort by area to optimize packing
         $("div#grid_" + offset + " > div").sort(function(a,b){
             //var var_a = Math.max(parseInt($(a).attr("data-height")),parseInt($(a).attr("data-width")));
             //var var_b = Math.max(parseInt($(b).attr("data-height")),parseInt($(b).attr("data-width")));
