@@ -5,6 +5,8 @@ var query_in_progress = false;
 var no_more_images = false;
 var search_user_changed = true;
 
+var is_mobile = false;
+
 function display_images(user){
     if(no_more_images){
         query_in_progress = false;
@@ -121,7 +123,7 @@ $(document).keyup(function(e) {
 
 $(document).on("scroll", function(e){
     var scroll_pos = $(document).scrollTop() + $(window).height();
-    $("#page_console").text(scroll_pos + " / " + $(document).height());
+    $("#page_console").text(scroll_pos + " / " + $(document).height() + " is_mobile: " + is_mobile);
     if($("#footer").offset().top - scroll_pos < 200){
         if(query_in_progress == false){
             query_in_progress = true;
@@ -131,7 +133,17 @@ $(document).on("scroll", function(e){
     }
 });
 
+function check_if_mobile() {
+    try {
+        if(/Android|webOS|iPhone|iPad|iPod|pocket|psp|kindle|avantgo|blazer|midori|Tablet|Palm|maemo|plucker|phone|BlackBerry|symbian|IEMobile|mobile|ZuneWP7|Windows Phone|Opera Mini/i.test(navigator.userAgent)) {
+            return true;
+        };
+        return false;
+    } catch(e){ console.log("Error in isMobile"); return false; }
+}
+
 $(document).ready(function(){
+    is_mobile = check_if_mobile();
     $("#user_input").text("speff7");
     $("#process_user_input").click(function(){
         if(query_in_progress == false){
