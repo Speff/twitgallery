@@ -37,6 +37,7 @@ hr{
 }
 
 #interactive_area{
+    width: 100%;
     text-align: center;
 }
 
