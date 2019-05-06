@@ -124,6 +124,23 @@ button {
     position: relative;
 }
 
+.loading_message{
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+    height: 100%;
+    width: 100%;
+
+    text-align: center;
+ 
+    color: #aaaaaa;
+    z-index: 6;
+}
+
+.gallery_images{
+    float: middle;
+}
+
 .main_image{
     position: relative;
     z-index: 5;
@@ -132,6 +149,18 @@ button {
     max-height: 100%;
 }
 
+.cover {
+    -webkit-animation: 2s show;
+    -moz-animation: 2s show;
+    -ms-animation: 2s show;
+    animation: 2s show;
+
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-fill-mode: forwards;
+    -ms-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+
+}
 
 .blur_image {
     position: absolute;
@@ -146,6 +175,10 @@ button {
     -ms-filter: blur(15px);
     filter: blur(15px);
     opacity: 0.3;
+}
+
+.grid-item{
+    position: relative;
 }
 
 .modal {
@@ -196,19 +229,6 @@ button {
 #picture_data a{
     color: inherit;
     font-size: inherit;
-}
-
-.cover {
-    -webkit-animation: 2s show;
-    -moz-animation: 2s show;
-    -ms-animation: 2s show;
-    animation: 2s show;
-
-    -webkit-animation-fill-mode: forwards;
-    -moz-animation-fill-mode: forwards;
-    -ms-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-
 }
 
 @-webkit-keyframes show {
