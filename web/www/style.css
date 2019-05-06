@@ -102,6 +102,10 @@ button {
     margin-bottom: 1.5vh
 }
 
+#grid_invis{
+    display: none;
+}
+
 #post{
     position: relative;
 }

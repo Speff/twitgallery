@@ -27,7 +27,7 @@ function display_images(user){
                     post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "<img class='blur_image' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "</div>";
-                    $("#grid").append(post_html);
+                    $("#grid_invis").append(post_html);
 
                     var new_element = $("#post_"+image_count);
 
@@ -52,9 +52,6 @@ function display_images(user){
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
 
-                    console.log(value["text"]);
-
-
                     new_element.attr("data-"+"width", orig_size_x);
                     new_element.attr("data-"+"height", orig_size_y);
                     new_element.attr("data-"+"orig_width", scaled_size_x);
@@ -78,7 +75,7 @@ function display_images(user){
         console.log(offset);
 
         // Sort by area to optimize packing
-        $("div#grid > div").slice((offset-1)*20, offset*20).sort(function(a,b){
+        $("div#grid_invis > div").sort(function(a,b){
             //var var_a = Math.max(parseInt($(a).attr("data-height")),parseInt($(a).attr("data-width")));
             //var var_b = Math.max(parseInt($(b).attr("data-height")),parseInt($(b).attr("data-width")));
             var var_a = parseInt($(a).attr("data-height"))*parseInt($(a).attr("data-width"));
@@ -86,10 +83,11 @@ function display_images(user){
             //var var_a = parseInt($(a).attr("data-height"));
             //var var_b = parseInt($(b).attr("data-height"));
             return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
-        }).appendTo("div#grid");
+        }).appendTo("div#grid_invis");
 
-        $.each($("div#grid > div").slice(20*(offset-1), 20*offset), function(index, elem){
-            $("#grid").packery('appended', elem);
+        $.each($("div#grid_invis > div"), function(index, elem){
+            $("#grid").append(elem)
+                .packery('appended', elem)
         });
 
 
