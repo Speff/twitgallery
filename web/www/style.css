@@ -102,6 +102,8 @@ button {
     margin-right: 3vw;
     margin-bottom: 1.5vh
     width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 #grid_invis{
