@@ -122,7 +122,7 @@ $(document).keyup(function(e) {
 $(document).on("scroll", function(e){
     var scroll_pos = $(document).scrollTop() + $(window).height();
     $("#page_console").text(scroll_pos + " / " + $(document).height());
-    if($(document).height() - scroll_pos < 200){
+    if($(document).outerHeight() - scroll_pos < 200){
         if(query_in_progress == false){
             query_in_progress = true;
             var user_to_process = "@" + $("#user_input").text();
