@@ -19,6 +19,7 @@ function display_images(user){
         }
 
         offset += 1;
+        $("#target").append("<div id='grid_" + offset + "' class='grid'></div>");
 
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
@@ -27,8 +28,7 @@ function display_images(user){
                     post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "<img class='blur_image' src='" + value["media_url_"+i] + ":small'></img>";
                     post_html += "</div>";
-                    //$("#grid_"+offset).append(post_html);
-                    $("#grid").append(post_html);
+                    $("#grid_"+offset).append(post_html);
 
                     var new_element = $("#post_"+image_count);
 
@@ -57,20 +57,17 @@ function display_images(user){
                     new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
                     new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+":large'></img>");
 
-                    $("#grid").packery('appended', new_element);
-
                     var img_src = new_element.click({"tag": new_element}, display_modal);
                     image_count += 1;
                 }
             }
         });
 
-        //console.log("packing");
-        //$('#grid_'+offset).packery({
-        //    // options
-        //    itemSelector: '.grid-item',
-        //    stagger: 5,
-        //});
+        $('#grid_'+offset).packery({
+            // options
+            itemSelector: '.grid-item',
+            stagger: 5,
+        });
 
         query_in_progress = false;
     }, "json");
@@ -136,15 +133,6 @@ $(document).ready(function(){
             query_in_progress = true;
 
             var user_to_process = "@" + $("#user_input").text();
-
-            $("#target").append("<div id='grid' class='grid'></div>");
-            console.log("packing");
-            $("#grid").packery({
-                // options
-                itemSelector: '.grid-item',
-                stagger: 5,
-            });
-
             display_images(user_to_process);
         }
     });
