@@ -38,7 +38,7 @@ function display_images(user){
                     var AR = orig_size_x / orig_size_y;
                     var mod_orig_size_x = orig_size_x*0.25;
                     var mod_orig_size_y = orig_size_y*0.25;
-                    var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
+                    var scaled_size_x = Math.round(mod_orig_size_x/512.0)*512.0;
                     if(scaled_size_x < 288) scaled_size_x = 288;
                     if(scaled_size_x > 640) scaled_size_x = 640;
                     var scaled_size_y = scaled_size_x / AR;
@@ -72,6 +72,17 @@ function display_images(user){
                 }
             }
         });
+
+        console.log("sorting");
+        $("div#grid_" + offset + " > div").sort(function(a,b){
+            //var var_a = Math.max(parseInt($(a).attr("data-height")),parseInt($(a).attr("data-width")));
+            //var var_b = Math.max(parseInt($(b).attr("data-height")),parseInt($(b).attr("data-width")));
+            var var_a = parseInt($(a).attr("data-height"))*parseInt($(a).attr("data-width"));
+            var var_b = parseInt($(b).attr("data-height"))*parseInt($(b).attr("data-width"));
+            //var var_a = parseInt($(a).attr("data-height"));
+            //var var_b = parseInt($(b).attr("data-height"));
+            return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
+        }).appendTo("div#grid_"+offset);
 
         $('#grid_'+offset).packery({
             // options
