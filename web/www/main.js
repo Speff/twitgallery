@@ -28,7 +28,11 @@ function display_images(user){
                 if(value["media_url_"+i] != null){
                     var post_html = "<div id='post_"+image_count+"' class='grid-item'>";
                     post_html += "<img class='main_image cover' src='" + value["media_url_"+i] + ":small'></img>";
-                    post_html += "<img class='blur_image' src='" + value["media_url_"+i] + ":small'></img>";
+
+                    if(is_mobile);
+                    else
+                        post_html += "<img class='blur_image' src='" + value["media_url_"+i] + ":small'></img>";
+
                     post_html += "</div>";
                     $("#grid_invis").append(post_html);
 
