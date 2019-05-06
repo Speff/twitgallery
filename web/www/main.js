@@ -39,6 +39,8 @@ function display_images(user){
                     var mod_orig_size_x = orig_size_x*0.25;
                     var mod_orig_size_y = orig_size_y*0.25;
                     var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
+                    if(scaled_size_x < 200) scaled_size_x = 288;
+                    if(scaled_size_x > 480) scaled_size_x = 480;
                     var scaled_size_y = scaled_size_x / AR;
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
