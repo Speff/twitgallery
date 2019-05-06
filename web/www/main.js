@@ -37,6 +37,10 @@ function display_images(user){
                     post_html += "</div>";
                     $("#grid_invis").append(post_html);
 
+                    $("#post_"+image_count + " > .main_image").on('load', function(e){
+                        $(e.target).parent().children(".loading_message").hide();
+                    });
+
                     var new_element = $("#post_"+image_count);
 
                     // Round grid sizes to minimize gaps
