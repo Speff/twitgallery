@@ -5,6 +5,16 @@ body{
     margin: 0px;
 }
 
+#page_console{
+    position: fixed;
+    float: left;
+    left: 0;
+    bottom: 0;
+    font-size: 4vh;
+    color: #ffffff;
+    text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black;
+    z-index: 999;
+}
 #header{
     margin-top: 0px;
     padding-top: 1.5vh;
