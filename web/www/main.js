@@ -46,14 +46,14 @@ function display_images(user){
                     var mod_orig_size_y = orig_size_y*0.25;
                     var scaled_size_x = Math.round(mod_orig_size_x/512.0)*512.0;
                     if(scaled_size_x < 288) scaled_size_x = 288;
-                    if(scaled_size_x > 640) scaled_size_x = 640;
+                    if(scaled_size_x > 576) scaled_size_x = 576;
                     var scaled_size_y = scaled_size_x / AR;
                     if(scaled_size_y < 288){
                         scaled_size_y = 288;
                         scaled_size_x = scaled_size_y * AR;
                     }
-                    if(scaled_size_y > 640){
-                        scaled_size_y = 640;
+                    if(scaled_size_y > 576){
+                        scaled_size_y = 576;
                         scaled_size_x = scaled_size_y * AR;
                     }
                     new_element.css("width", scaled_size_x);
