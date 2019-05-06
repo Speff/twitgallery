@@ -130,7 +130,7 @@ $(document).keyup(function(e) {
 
 $(document).on("scroll", function(e){
     var scroll_pos = $(document).scrollTop() + $(window).height();
-    $("#page_console").text(scroll_pos + " / " + $(document).height() + " is_mobile: " + is_mobile);
+    //$("#page_console").text(scroll_pos + " / " + $(document).height() + " is_mobile: " + is_mobile);
     if($("#footer").offset().top - scroll_pos < 200){
         if(query_in_progress == false){
             query_in_progress = true;
