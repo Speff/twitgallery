@@ -98,9 +98,9 @@ button {
 }
 
 #target{
-    margin-left: 3vw;
-    margin-right: 3vw;
-    margin-bottom: 1.5vh
+    padding-left: 3vw;
+    padding-right: 3vw;
+    padding-bottom: 1.5vh
     width: 100vw;
     overflow-x: hidden;
     overflow-y: hidden;
