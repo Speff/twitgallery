@@ -12,7 +12,7 @@ function display_images(user){
 
     $.post("/api/get_results", {"user_id": user, "offset": offset}, function(data, status){
         if(status != "success"){
-            $("#end_results_target").text("End of images");
+            $("#end_results_target").text("The End");
             query_in_progress = false;
             no_more_images = true;
             return false;
@@ -39,9 +39,17 @@ function display_images(user){
                     var mod_orig_size_x = orig_size_x*0.25;
                     var mod_orig_size_y = orig_size_y*0.25;
                     var scaled_size_x = Math.round(mod_orig_size_x/64.0)*64.0;
-                    if(scaled_size_x < 200) scaled_size_x = 288;
-                    if(scaled_size_x > 480) scaled_size_x = 480;
+                    if(scaled_size_x < 288) scaled_size_x = 288;
+                    if(scaled_size_x > 640) scaled_size_x = 640;
                     var scaled_size_y = scaled_size_x / AR;
+                    if(scaled_size_y < 288){
+                        scaled_size_y = 288;
+                        scaled_size_x = scaled_size_y * AR;
+                    }
+                    if(scaled_size_y > 640){
+                        scaled_size_y = 640;
+                        scaled_size_x = scaled_size_y * AR;
+                    }
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
 
