@@ -83,10 +83,14 @@ function display_images(user){
 
         // Sort by area to optimize packing
         $("div#grid_invis > div").sort(function(a,b){
-            //var var_a = Math.max(parseInt($(a).attr("data-height")),parseInt($(a).attr("data-width")));
-            //var var_b = Math.max(parseInt($(b).attr("data-height")),parseInt($(b).attr("data-width")));
-            var var_a = parseInt($(a).attr("data-height"))*parseInt($(a).attr("data-width"));
-            var var_b = parseInt($(b).attr("data-height"))*parseInt($(b).attr("data-width"));
+            if(is_mobile){
+                var var_b = Math.max(parseInt($(a).attr("data-height")),parseInt($(a).attr("data-width")));
+                var var_a = Math.max(parseInt($(b).attr("data-height")),parseInt($(b).attr("data-width")));
+            }
+            else{
+                var var_a = parseInt($(a).attr("data-height"))*parseInt($(a).attr("data-width"));
+                var var_b = parseInt($(b).attr("data-height"))*parseInt($(b).attr("data-width"));
+            }
             //var var_a = parseInt($(a).attr("data-height"));
             //var var_b = parseInt($(b).attr("data-height"));
             return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
