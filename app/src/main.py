@@ -61,9 +61,13 @@ api.add_resource(process_user, '/process_user')
 api.add_resource(get_results, '/get_results')
 
 def validate_searched_user(screen_name=None):
-    try:
-        timeline = twit_api.GetFavorites(screen_name=screen_name, count=1)
-    except: return False
+    #timeline = twit_api.GetFavorites(screen_name=screen_name, count=1)
+    try: user = twit_api.VerifyCredentials()
+    except Exception as e:
+        print("Twitter verify malfunctioned")
+        print(e)
+        return False
+    if user is None: return False
     else: return True
 
 def get_user(screen_name=None, offset=0):
