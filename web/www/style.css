@@ -6,12 +6,29 @@ body{
     touch-action: manipulation;
 }
 
+#sign_in_section{
+    position: fixed; /* Stay in place */
+    float: right;
+    right: 0px;
+    top: 0px;
+    height: 8vh;
+    width: 8vw;
+    max-height: 3em;
+    max-width: 3em;
+    padding-right: 1vw;
+    padding-top: 1vh;
+}
+
 #sign_in{
     display: none;
+    width: 100%;
+    height: 100%;
 }
 
 #sign_in img{
     filter: invert(100%);
+    width: 100%;
+    height: auto;
 }
 
 #page_console{
