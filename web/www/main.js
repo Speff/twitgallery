@@ -249,5 +249,8 @@ $(document).ready(function(){
         selection.removeAllRanges();
         selection.addRange(range);
     });
+    $("span#user_input").keypress(function(e){
+        if(e.keyCode === 10 || e.keyCode === 13) e.preventDefault();
+    });
 });
 
