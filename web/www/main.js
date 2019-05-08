@@ -12,9 +12,13 @@ function check_if_signed_in(){
         console.log(data);
         if(data.status == "Authenticated"){
             $("#sign_in").hide();
+            $("#process_user_input").removeClass("enabled")
+                .css({"color": "initial"});
         }
         else{
             $("#sign_in").show();
+            $("#process_user_input").prop("disabled", true)
+                .css({"color": "gray"});
             $("#sign_in").click(sign_in);
         }
     })
