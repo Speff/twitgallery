@@ -122,13 +122,12 @@ button {
     background-color: #e7e7e7; /* Green */
     border: none;
     color: black;
-    padding: 0.5em 2.5vw;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 0.8em;
     font-weight: 500;
-    width: 20ch;
+    width: 22ch;
     height: 2em;
 }
 
