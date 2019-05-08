@@ -7,16 +7,14 @@ body{
 }
 
 #sign_in_section{
-    position: fixed; /* Stay in place */
+    position: absolute; /* Stay in place */
     float: right;
-    right: 0px;
-    top: 0px;
+    right: 1vw;
+    top: 1vh;
     height: 8vh;
     width: 8vw;
     max-height: 3em;
     max-width: 3em;
-    padding-right: 1vw;
-    padding-top: 1vh;
 }
 
 #sign_in{
