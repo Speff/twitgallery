@@ -1,4 +1,6 @@
 import os
+import sys
+import signal
 from datetime import datetime
 import twitter
 import psycopg2
@@ -152,8 +154,12 @@ def check_user_status(screen_name):
             pg_con.close()
             return "user already in db"
 
+def handler(signum, frame):
+    sys.exit(1)
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGTERM, handler)
+
     #try:
     #    pg_con = psycopg2.connect(pg_connect_info)
     #except:
