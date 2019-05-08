@@ -6,6 +6,10 @@ body{
     touch-action: manipulation;
 }
 
+#sign_in{
+    display: none;
+}
+
 #page_console{
     position: fixed;
     float: left;
