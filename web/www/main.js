@@ -7,6 +7,39 @@ var search_user_changed = true;
 
 var is_mobile = false;
 
+function check_if_signed_in(){
+    $.get("/api/verify_twit", function(data){
+        console.log(data);
+        if(data.status == "Authenticated"){
+            $("#sign_in").hide();
+        }
+        else{
+            $("#sign_in").show();
+            $("#sign_in").click(sign_in);
+        }
+    })
+}
+
+function sign_in(){
+    $.get("/api/get_auth_url", function(data){
+        var auth_url = data.auth_url;
+
+        var spawned_window = window.open(auth_url, "_blank" , {
+            "menubar": "no",
+            "status": "no",
+            "toolbar": "no"
+        });
+
+        var pollTimer = window.setInterval(function() {
+            if (spawned_window.closed !== false){
+                window.clearInterval(pollTimer);
+                console.log("Child window closed");
+                check_if_signed_in();
+            }
+        }, 200);
+    });
+}
+
 function display_images(user){
     if(no_more_images){
         query_in_progress = false;
@@ -157,6 +190,8 @@ function check_if_mobile() {
 
 $(document).ready(function(){
     is_mobile = check_if_mobile();
+    check_if_signed_in();
+
     $("#user_input").text("speff7");
     $("#process_user_input").click(function(){
         if(query_in_progress == false){

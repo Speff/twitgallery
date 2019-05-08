@@ -5,11 +5,16 @@ from datetime import datetime
 import twitter
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask, request
+from flask import Flask, request, session
 from flask_restful import Resource, Api
+import oauth2 as oauth
+import urllib.parse
+import uuid
+
 
 app = Flask(__name__)
 api = Api(app)
+app.secret_key = os.environ["IPSO_COOKIE_AUTH"].encode("utf-8")
 
 twit_api = twitter.Api(consumer_key=os.environ['CONSUMER_KEY'],
                   consumer_secret=os.environ['CONSUMER_SECRET'],
@@ -56,9 +61,151 @@ class get_results(Resource):
                 "status": user_status,
                 "user_id": screen_name
                 }, status_code
+class get_auth_url(Resource):
+    def get(self):
+        if request.method == "GET":
+            ret_uuid = str(uuid.uuid4())
+
+            session['tg_guid'] = ret_uuid
+
+            consumer_key = os.environ['CONSUMER_KEY']
+            consumer_secret = os.environ['CONSUMER_SECRET']
+            consumer = oauth.Consumer(consumer_key, consumer_secret)
+
+            request_token_url = 'https://api.twitter.com/oauth/request_token'
+            authorize_url = 'https://api.twitter.com/oauth/authorize'
+
+            client = oauth.Client(consumer)
+
+            resp, content = client.request(request_token_url, "GET")
+            if resp['status'] != '200':
+                return {"status": "Twitter unavailable"}, 500
+            
+            request_token = dict(urllib.parse.parse_qsl(content))
+            oauth_token_secret = request_token["oauth_token_secret".encode("utf-8")].decode("utf-8")
+
+            try:
+                pg_con = psycopg2.connect(pg_connect_info)
+                pg_cur = pg_con.cursor()
+                pg_cur.execute("""INSERT INTO user_keys(session_current_user, oauth_token_secret) VALUES (%s, %s)""", (ret_uuid, oauth_token_secret))
+                pg_con.commit()
+                pg_con.close()
+            except psycopg2.Error as e:
+                print(e)
+                return {"status": "db insert failed"}, 500
+
+            return {
+                    "auth_url": "%s?oauth_token=%s" % (authorize_url, str(request_token["oauth_token".encode("utf-8")].decode("utf-8")))
+                    }, 201
+
+class auth_twit(Resource):
+    def get(self):
+        if "tg_guid" in session:
+            if request.method == 'GET':
+                oauth_token = request.args.get("oauth_token")
+                try:
+                    pg_con = psycopg2.connect(pg_connect_info)
+                    pg_cur = pg_con.cursor()
+                    pg_cur.execute("""SELECT oauth_token_secret FROM user_keys WHERE session_current_user=%s""", (session["tg_guid"],))
+                    oauth_token_secret = pg_cur.fetchone()[0]
+                    pg_con.close()
+                except psycopg2.Error as e:
+                    print(e)
+                    return {"status": "db read failed"}, 500
+                else:
+                    access_token_url = 'https://api.twitter.com/oauth/access_token'
+
+                    token = oauth.Token(oauth_token, oauth_token_secret)
+                    token.set_verifier(request.args.get("oauth_verifier"))
+                    
+                    consumer_key = os.environ['CONSUMER_KEY']
+                    consumer_secret = os.environ['CONSUMER_SECRET']
+                    consumer = oauth.Consumer(consumer_key, consumer_secret)
+
+                    client = oauth.Client(consumer, token)
+
+                    resp, content = client.request(access_token_url, "POST")
+                    access_token_dict = dict(urllib.parse.parse_qsl(content))
+
+                    access_token = "%s" % access_token_dict['oauth_token'.encode("utf-8")].decode("utf-8")
+                    access_token_secret = "%s" % access_token_dict['oauth_token_secret'.encode("utf-8")].decode("utf-8")
+
+                    try:
+                        pg_con = psycopg2.connect(pg_connect_info)
+                        pg_cur = pg_con.cursor()
+                        pg_cur.execute("""UPDATE user_keys SET access_token=%s, access_token_secret=%s WHERE session_current_user=%s""",
+                                (access_token, access_token_secret, session["tg_guid"]))
+
+                        pg_con.commit()
+                        pg_con.close()
+                    except psycopg2.Error as e:
+                        print(e)
+                        return {"status": "db insert failed"}, 500
+
+                    return { "status": "Authenticated", }, 201
+        else:
+            return {"status": "Access Denied"}, 403
+
+class verify_twit(Resource):
+    def get(self):
+        if "tg_guid" in session:
+            token = ''
+            token_secret = ''
+
+            try:
+                pg_con = psycopg2.connect(pg_connect_info)
+                pg_cur = pg_con.cursor()
+                pg_cur.execute("""SELECT access_token, access_token_secret FROM user_keys WHERE session_current_user=%s""", (session["tg_guid"],))
+                pg_ret = pg_cur.fetchone()
+                if pg_ret is not None:
+                    (token, token_secret) = (pg_ret[0], pg_ret[1])
+                pg_con.close()
+            except psycopg2.Error as e:
+                print(e)
+                return {"status": "db lookup failed"}, 200
+
+            if token is not None and token_secret is not None:
+                twit_api = twitter.Api(consumer_key=os.environ['CONSUMER_KEY'],
+                        consumer_secret=os.environ['CONSUMER_SECRET'],
+                        access_token_key=token,
+                        access_token_secret=token_secret)
+
+                user = twit_api.VerifyCredentials()
+                if user is not None:
+                    return {
+                            "status": "Authenticated",
+                            "twitter_user": user.name,
+                            "profile_img_url": user.profile_image_url_https
+                            }, 202
+                else:
+                    return {"status": "twitter auth error"}, 200
+            else:
+                return {"status": "twitter auth not accepted"}, 200
+        else:
+            return {"status": "Not Authenticated"}, 200
+
+class sign_out(Resource):
+    def get(self):
+        try:
+            pg_con = psycopg2.connect(pg_connect_info)
+            pg_cur = pg_con.cursor()
+            pg_cur.execute("""DELETE FROM user_keys WHERE session_current_user=%s""", (session["tg_guid"],))
+            pg_con.close()
+        except psycopg2.Error as e:
+            print(e)
+            return {"status": "Sign-out Failed"}, 200
+
+        session.pop('tg_guid', None)
+        return {"status": "Signed out"}, 200
+
 
 api.add_resource(process_user, '/process_user')
 api.add_resource(get_results, '/get_results')
+api.add_resource(auth_twit, '/auth_twit')
+api.add_resource(verify_twit, '/verify_twit')
+api.add_resource(get_auth_url, '/get_auth_url')
+api.add_resource(sign_out, '/logout')
+
 
 def validate_searched_user(screen_name=None):
     #timeline = twit_api.GetFavorites(screen_name=screen_name, count=1)

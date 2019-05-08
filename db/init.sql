@@ -35,6 +35,8 @@ CREATE TABLE user_status(
 
 CREATE TABLE user_keys(
     session_current_user TEXT,
+    oauth_token_secret TEXT,
     access_token TEXT,
     access_token_secret TEXT
+
 );
