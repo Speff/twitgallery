@@ -93,7 +93,8 @@ class get_auth_url(Resource):
             consumer_secret = os.environ['CONSUMER_SECRET']
             consumer = oauth.Consumer(consumer_key, consumer_secret)
 
-            request_token_url = 'https://api.twitter.com/oauth/request_token'
+            print(os.environ['CALLBACK_URL'])
+            request_token_url = "https://api.twitter.com/oauth/request_token?oauth_callback=" + os.environ['CALLBACK_URL']
             authorize_url = 'https://api.twitter.com/oauth/authorize'
 
             client = oauth.Client(consumer)
