@@ -10,6 +10,10 @@ body{
     display: none;
 }
 
+#sign_in img{
+    filter: invert(100%);
+}
+
 #page_console{
     position: fixed;
     float: left;
