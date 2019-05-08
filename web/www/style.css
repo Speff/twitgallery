@@ -58,7 +58,7 @@ body{
     margin-bottom: 1.0vh;
     font-weight: 100;
     font-family: 'Raleway', sans-serif;
-    font-size: 4em;
+    font-size: 4em !important;
 }
 
 hr{
@@ -82,22 +82,22 @@ hr{
 #input{
     background-color: #5a5a5a;
     border: 1px solid transparent;
-    line-height: 3.4vh;
-    font-size: 2.5vh;
+    line-height: 0em;
+    font-size: 1.2em;
     text-align: center;
     margin: auto;
-    margin-top: 2vh;
-    margin-bottom: 0.5vh;
+    margin-top: 0.8em;
+    margin-bottom: 0.3em;
     width: 40ch;
-    height: 3.5vh;
+    height: 2.0em
     max-width: 80%;
 }
 
 #user_input{
-    line-height: 3.4vh;
+    line-height: 1.6em;
     margin: auto;
     width: 3.4vw;
-    height: 3.5vh;
+    height: 1.8em;
     color: #fafafa;
     font-weight: 500;
     outline: none;
@@ -113,22 +113,22 @@ hr{
 }
 
 #buttons{
-    padding-top: 0.8vh;
-    padding-bottom: 1.5vh;
+    padding-top: 0.4em;
+    padding-bottom: 0.75em;
 }
 
 button {
     background-color: #e7e7e7; /* Green */
     border: none;
     color: black;
-    padding: 0.5vh 2.5vw;
+    padding: 0.5em 2.5vw;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 1.8vh;
+    font-size: 0.8em;
     font-weight: 500;
     width: 20ch;
-    height: 3vh;
+    height: 2em;
 }
 
 #process_user_result, #end_results_target{
@@ -278,7 +278,7 @@ button {
 }
 
 #footer{
-    font-size: 1.6vh;
+    font-size: 0.9em;
     margin-right: 1vw;
     text-align: right;
     color: #999999;
