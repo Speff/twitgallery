@@ -28,13 +28,15 @@ body{
     padding-bottom: 1vh;
 }
 
-h1{
-    padding-top: 1.5vh;
+#header_text{
+    padding-top: 0vh;
+    padding-bottom: 1vh;
     text-align: center;
     color: #f7f7f7;
-    margin-top: 1.5vh;
-    margin-bottom: 1vh;
-    font-weight: lighter;
+    margin-top: 1.0vh;
+    margin-bottom: 1.0vh;
+    font-weight: 100;
+    font-family: 'Raleway', sans-serif;
     font-size: 4em;
 }
 
