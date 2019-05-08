@@ -67,6 +67,7 @@ hr{
     margin-bottom: 0.5vh;
     width: 40ch;
     height: 3.5vh;
+    max-width: 80%;
 }
 
 #user_input{
