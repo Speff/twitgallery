@@ -155,21 +155,30 @@ function display_images(user){
 function display_modal(input){
     current_post = input.data.tag[0].attributes;
     $("#modal_fs").show();
-    $(".modal_content").css("width", current_post["data-width"].nodeValue);
+    console.log(current_post);
 
-    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a></h4>")
-        .append("<span class='search_selected'> [Search user] </span>")
+    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span class='search_selected'> [Search user] </span></h4>")
+        .append()
         .append("<h5>" + current_post["data-text"].nodeValue + "</h5>");
     $("#picture_fs").html(current_post["data-image"].nodeValue)
         .click(function(){
-            $("#modal_fs").hide();
+            console.log("hit");
+            $("#picture_fs > img").removeClass().removeAttr('max-height');
+            $("#picture_fs > img").removeClass().removeAttr('max-width');
+            //$("#modal_fs").hide();
         });
+
+    var ar = current_post["data-width"].nodeValue / current_post["data-height"].nodeValue;
+    $("#picture_fs > img").css("max-width", "100vw");
+    $("#picture_fs > img").css("max-height", $(window).height() - $("#picture_data").height());
 };
 
 $(document).click(function(e){
-    if(e.target == $("#modal_fs")[0]){
-        $("#modal_fs").hide();
+    console.log(e.target);
+    if(e.target == $("#picture_fs > img")[0]){
+        console.log("Enlarge image");
     }
+    else; //$("#modal_fs").hide();
 });
 
 $(document).keyup(function(e) {

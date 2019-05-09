@@ -216,22 +216,24 @@ button {
     z-index: 999; /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgba(0, 0, 0, 0.7);
-}
-
-.modal_author{
-    display: inline;
+    width: 100vw;
+    height: 100vh;
 }
 
 /* Modal Content/Box */
 .modal_content {
+    display: flex;
+    flex-direction: column;
+    width: auto !important;
     animation-name: zoom;
     animation-duration: 0.1s;
     margin: auto;
     z-index: 999;
+}
+
+.modal_author{
 }
 
 .modal_content img{
@@ -245,6 +247,7 @@ button {
 }
 
 #picture_data{
+    text-align: center;
     font-weight: lighter;
     font-size: 1.9vh;
     color: #fafafa;
@@ -262,6 +265,10 @@ button {
 #picture_data a{
     color: inherit;
     font-size: inherit;
+}
+
+#picture_fs{
+    display: flex;
 }
 
 @-webkit-keyframes show {
