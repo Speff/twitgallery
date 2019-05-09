@@ -157,16 +157,20 @@ function display_modal(input){
     selected_image_fs = 0;
     current_post = input.data.tag[0].attributes;
     $("#modal_fs").show();
-    console.log(current_post);
 
-    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span class='search_selected'> [Search user] </span></h4>")
+    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span id='search_selected'> [Search user] </span></h4>")
         .append()
         .append("<br><h5>" + current_post["data-text"].nodeValue + "</h5>");
     $("#picture_fs").html(current_post["data-image"].nodeValue);
 
-    var ar = current_post["data-width"].nodeValue / current_post["data-height"].nodeValue;
     $("#picture_fs > img").css("max-width", "100vw");
     $("#picture_fs > img").css("max-height", $(window).height() - $("#picture_data").height());
+
+    $("#search_selected").click(function(){
+        $("#modal_fs").hide();
+        $("#user_input").text(current_post["data-screen_name"].nodeValue);
+
+    });
 };
 
 
@@ -181,8 +185,6 @@ $(document).click(function(e){
             selected_image_fs = 0;
             $("#modal_fs").hide();
         }
-        
-        console.log("Selected_image_fs" + selected_image_fs);
     }
     else if(e.target == $("#modal_fs")[0]) $("#modal_fs").hide();
     else if(e.target == $("#picture_data")[0]) $("#modal_fs").hide();
