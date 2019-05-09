@@ -157,7 +157,8 @@ function display_modal(input){
     $("#modal_fs").show();
     $(".modal_content").css("width", current_post["data-width"].nodeValue);
 
-    $("#picture_data").html("<h4><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a></h4>")
+    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a></h4>")
+        .append("<span class='search_selected'> [Search user] </span>")
         .append("<h5>" + current_post["data-text"].nodeValue + "</h5>");
     $("#picture_fs").html(current_post["data-image"].nodeValue)
         .click(function(){

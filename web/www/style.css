@@ -222,6 +222,10 @@ button {
     background-color: rgba(0, 0, 0, 0.7);
 }
 
+.modal_author{
+    display: inline;
+}
+
 /* Modal Content/Box */
 .modal_content {
     animation-name: zoom;
