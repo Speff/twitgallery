@@ -169,6 +169,8 @@ function display_modal(input){
     $("#search_selected").click(function(){
         $("#modal_fs").hide();
         $("#user_input").text(current_post["data-screen_name"].nodeValue);
+        $("#grid").remove();
+        window.scrollTo({ top: 0, behavior: 'smooth' })
 
     });
 };
