@@ -4,6 +4,7 @@ var image_count = 0;
 var query_in_progress = false;
 var no_more_images = false;
 var search_user_changed = true;
+var selected_image_fs = 0;
 
 var is_mobile = false;
 
@@ -153,6 +154,7 @@ function display_images(user){
 }
 
 function display_modal(input){
+    selected_image_fs = 0;
     current_post = input.data.tag[0].attributes;
     $("#modal_fs").show();
     console.log(current_post);
@@ -167,16 +169,20 @@ function display_modal(input){
     $("#picture_fs > img").css("max-height", $(window).height() - $("#picture_data").height());
 };
 
-$(document).click(function(e){
-    console.log(e.target);
-    if(e.target == $("#picture_fs > img")[0]){
-        console.log("Enlarge image");
-        $("#picture_fs > img").css("max-width", "");
-        $("#picture_fs > img").css("max-height", "");
 
-        $(this).one("click", function(){
+$(document).click(function(e){
+    if(e.target == $("#picture_fs > img")[0]){
+        if(selected_image_fs == 0){
+            selected_image_fs = 1;
+            $("#picture_fs > img").css("max-width", "");
+            $("#picture_fs > img").css("max-height", "");
+        }
+        else if(selected_image_fs == 1){
+            selected_image_fs = 0;
             $("#modal_fs").hide();
-        });
+        }
+        
+        console.log("Selected_image_fs" + selected_image_fs);
     }
     else if(e.target == $("#modal_fs")[0]) $("#modal_fs").hide();
     else if(e.target == $("#picture_data")[0]) $("#modal_fs").hide();
