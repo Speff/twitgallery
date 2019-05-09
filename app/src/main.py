@@ -85,6 +85,28 @@ class get_user_favorites(Resource):
                 "user_id": screen_name
                 }, status_code
 
+class get_user_posts(Resource):
+    def post(self):
+        screen_name = request.form["user_id"]
+        offset = request.form["offset"]
+
+        user_status_result = get_user(screen_name, offset)
+
+        if user_status_result == "no more results":
+            user_status = user_status_result
+            status_code = 204
+        elif user_status_result == "db_error":
+            user_status = "db connection error"
+            status_code = 503
+        else:
+            user_status = user_status_result
+            status_code = 202
+
+        return {
+                "status": user_status,
+                "user_id": screen_name
+                }, status_code
+
 class get_auth_url(Resource):
     def get(self):
         if request.method == "GET":
@@ -226,6 +248,7 @@ class sign_out(Resource):
 
 api.add_resource(process_user, '/process_user')
 api.add_resource(get_user_favorites, '/get_user_favorites')
+api.add_resource(get_user_posts, '/get_user_posts')
 api.add_resource(auth_twit, '/auth_twit')
 api.add_resource(verify_twit, '/verify_twit')
 api.add_resource(get_auth_url, '/get_auth_url')
