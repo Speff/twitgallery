@@ -51,7 +51,7 @@ function display_images(user){
         return false;
     }
 
-    $.post("/api/get_results", {"user_id": user, "offset": offset}, function(data, status){
+    $.post("/api/get_user_favorites", {"user_id": user, "offset": offset}, function(data, status){
         if(status != "success"){
             $("#end_results_target").text("The End");
             query_in_progress = false;

@@ -63,7 +63,7 @@ class process_user(Resource):
                     "status": "Not authenticated"
                     }, 403
 
-class get_results(Resource):
+class get_user_favorites(Resource):
     def post(self):
         screen_name = request.form["user_id"]
         offset = request.form["offset"]
@@ -225,7 +225,7 @@ class sign_out(Resource):
 
 
 api.add_resource(process_user, '/process_user')
-api.add_resource(get_results, '/get_results')
+api.add_resource(get_user_favorites, '/get_user_favorites')
 api.add_resource(auth_twit, '/auth_twit')
 api.add_resource(verify_twit, '/verify_twit')
 api.add_resource(get_auth_url, '/get_auth_url')
