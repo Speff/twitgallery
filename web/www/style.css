@@ -256,11 +256,13 @@ button {
 
 #picture_data h4{
     margin-bottom: 0px;
+    display: inline;
 }
 #picture_data h5{
     font-size: 1.3vh;
     font-weight: lighter;
     margin-top: 0.5vh;
+    display: inline;
 }
 #picture_data a{
     color: inherit;

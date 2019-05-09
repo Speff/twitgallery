@@ -159,14 +159,8 @@ function display_modal(input){
 
     $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span class='search_selected'> [Search user] </span></h4>")
         .append()
-        .append("<h5>" + current_post["data-text"].nodeValue + "</h5>");
-    $("#picture_fs").html(current_post["data-image"].nodeValue)
-        .click(function(){
-            console.log("hit");
-            $("#picture_fs > img").removeClass().removeAttr('max-height');
-            $("#picture_fs > img").removeClass().removeAttr('max-width');
-            //$("#modal_fs").hide();
-        });
+        .append("<br><h5>" + current_post["data-text"].nodeValue + "</h5>");
+    $("#picture_fs").html(current_post["data-image"].nodeValue);
 
     var ar = current_post["data-width"].nodeValue / current_post["data-height"].nodeValue;
     $("#picture_fs > img").css("max-width", "100vw");
@@ -177,8 +171,16 @@ $(document).click(function(e){
     console.log(e.target);
     if(e.target == $("#picture_fs > img")[0]){
         console.log("Enlarge image");
+        $("#picture_fs > img").css("max-width", "");
+        $("#picture_fs > img").css("max-height", "");
+
+        $(this).one("click", function(){
+            $("#modal_fs").hide();
+        });
     }
-    else; //$("#modal_fs").hide();
+    else if(e.target == $("#modal_fs")[0]) $("#modal_fs").hide();
+    else if(e.target == $("#picture_data")[0]) $("#modal_fs").hide();
+    else if(e.target == $("#picture_fs")[0]) $("#modal_fs").hide();
 });
 
 $(document).keyup(function(e) {
