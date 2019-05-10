@@ -28,6 +28,12 @@ CREATE TABLE user_favorites(
     UNIQUE(screen_name, post_id)
 );
 
+CREATE TABLE user_posts(
+    screen_name TEXT,
+    post_id TEXT,
+    UNIQUE(screen_name, post_id)
+);
+
 CREATE TABLE user_status(
     screen_name TEXT,
     status TEXT
