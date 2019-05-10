@@ -50,11 +50,11 @@ class process_user(Resource):
             if user_db_status != "success":
                 return {"status": "user already being processed"}, 200
 
-            post_processing_result = get_posts_favorites(screen_name, twit_api_instance)
+            post_processing_result = get_posts(screen_name, twit_api_instance, "favorites")
             if post_processing_result == "success":
                 return {
                         "status": "success",
-                        "user_ud": screen_name
+                        "user_id": screen_name
                         }, 202
             else:
                 return {
@@ -300,14 +300,21 @@ def get_user(screen_name=None, offset=0):
         if len(ret) == 0: return "no more results"
         return ret
 
-def get_posts_favorites(screen_name=None, twit_api_instance=None):
+def get_posts(screen_name=None, twit_api_instance=None, post_type="favorites"):
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
         return "db access failure"
     else:
         try:
-            favorites = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
-        except:
+            print(post_type)
+            if post_type == "favorites":
+                posts = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
+            elif post_type == "posts":
+                posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, count=200)
+            else:
+                raise Exception('wtf you sending me')
+        except Exception as e:
+            print(e)
             pg_cur = pg_con.cursor()
             pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
             pg_con.commit()
@@ -315,15 +322,19 @@ def get_posts_favorites(screen_name=None, twit_api_instance=None):
             return "twitter_lookup_failed"
         else:
             pg_cur = pg_con.cursor()
-            for favorite in favorites:
-                create_time = datetime.strptime(favorite.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+            for post in posts:
+                create_time = datetime.strptime(post.created_at, '%a %b %d %H:%M:%S +0000 %Y')
                 str_create_time = create_time.strftime("%m/%d/%Y, %H:%M:%S")
-                pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;""",(str_create_time, favorite.id_str, favorite.text, favorite.user.name, favorite.user.screen_name, favorite.user.profile_image_url, str(favorite.possibly_sensitive), "https://twitter.com/"+favorite.user.screen_name+"/status/"+favorite.id_str)) 
-                pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s) ON CONFLICT DO NOTHING""", (screen_name, favorite.id_str))
+                pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;""",(str_create_time, post.id_str, post.text, post.user.name, post.user.screen_name, post.user.profile_image_url, str(post.possibly_sensitive), "https://twitter.com/"+post.user.screen_name+"/status/"+post.id_str)) 
+                # TODO - change out user_favorites below
+                if post_type == "favorites":
+                    pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s) ON CONFLICT DO NOTHING""", (screen_name, post.id_str))
+                elif post_type == "posts":
+                    pg_cur.execute("""INSERT INTO user_posts(screen_name, post_id) VALUES(%s,%s) ON CONFLICT DO NOTHING""", (screen_name, post.id_str))
                 try:
-                    for index, media in enumerate(favorite.media):
+                    for index, media in enumerate(post.media):
                         media_url = media.media_url
-                        id_str = favorite.id_str
+                        id_str = post.id_str
                         media_url_size_x = media.sizes['large']['w']
                         media_url_size_y = media.sizes['large']['h']
 
