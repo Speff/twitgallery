@@ -41,12 +41,14 @@ class process_user(Resource):
                     access_token_key=token,
                     access_token_secret=token_secret)
 
-            if validate_searched_user(twit_api_instance) == False:
+            if validate_twitter_credentials(twit_api_instance) == False:
                 return {"status": "credentials no longer valid"}, 200
 
             screen_name = request.form["user_id"]
 
             user_status_result = check_user_status(screen_name, twit_api_instance)
+
+
             if user_status_result == "db_error":
                 user_status = "db connection error"
                 status_code = 503
@@ -255,7 +257,7 @@ api.add_resource(get_auth_url, '/get_auth_url')
 api.add_resource(sign_out, '/logout')
 
 
-def validate_searched_user(twit_api_instance=None):
+def validate_twitter_credentials(twit_api_instance=None):
     try: user = twit_api_instance.VerifyCredentials()
     except Exception as e:
         print("Twitter verify malfunctioned")
@@ -331,7 +333,7 @@ def search_user(screen_name=None, twit_api_instance=None):
     return True
 
 def check_user_status(screen_name, twit_api_instance=None):
-    if validate_searched_user(twit_api_instance) == False: return "user not found"
+    if validate_twitter_credentials(twit_api_instance) == False: return "user not found"
     try:
         pg_con = psycopg2.connect(pg_connect_info)
     except:
