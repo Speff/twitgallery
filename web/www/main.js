@@ -5,6 +5,7 @@ var query_in_progress = false;
 var no_more_images = false;
 var search_user_changed = true;
 var selected_image_fs = 0;
+var images_displayed = "favorites"
 
 var is_mobile = false;
 
@@ -51,7 +52,7 @@ function display_images(user){
         return false;
     }
 
-    $.post("/api/get_user_favorites", {"user_id": user, "offset": offset}, function(data, status){
+    $.post("/api/get_user_"+images_displayed, {"user_id": user, "offset": offset}, function(data, status){
         if(status != "success"){
             $("#end_results_target").text("The End");
             query_in_progress = false;
@@ -228,20 +229,43 @@ $(document).ready(function(){
             query_in_progress = true;
             $("#process_user_result").text("Processing User...");
             var user_to_process = "@" + $("#user_input").text();
-            $.post("/api/process_user", {"user_id": user_to_process}, function(data, status){
-                query_in_progress = false;
-                if(status == "success"){
-                    $("#process_user_result").text("User processed successfully");
-                    no_more_images = false;
-                }
-                else{
-                    $("#process_user_result").text("User processing failed");
-                }
-            });
+            $.post("/api/process_user",
+                {
+                    "user_id": user_to_process,
+                    "post_type": "posts"
+                }, function(data, status){
+                    query_in_progress = false;
+                    if(status == "success"){
+                        $("#process_user_result").text("User processed successfully");
+                        no_more_images = false;
+                    }
+                    else{
+                        $("#process_user_result").text("User processing failed");
+                    }
+                });
         }
         else; // Do nothing. There's already a query in progress
     });
-    $("#get_user_images").click(function(){
+    $("#get_user_favorites").click(function(){
+        images_displayed = "favorites";
+        if(query_in_progress == false){
+            if(search_user_changed) $("#target").empty();
+
+            search_user_changed = false;
+            query_in_progress = true;
+
+            var user_to_process = "@" + $("#user_input").text();
+            $("#target").append("<div id='grid' class='grid'></div>");
+            $("#grid").packery({
+                // options
+                itemSelector: '.grid-item',
+                stagger: 5,
+            });
+            display_images(user_to_process);
+        }
+    });
+    $("#get_user_posts").click(function(){
+        images_displayed = "posts";
         if(query_in_progress == false){
             if(search_user_changed) $("#target").empty();
 

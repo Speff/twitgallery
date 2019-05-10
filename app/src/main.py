@@ -50,7 +50,7 @@ class process_user(Resource):
             if user_db_status != "success":
                 return {"status": "user already being processed"}, 200
 
-            post_processing_result = get_posts(screen_name, twit_api_instance, "favorites")
+            post_processing_result = get_posts(screen_name, twit_api_instance, request.form["post_type"])
             if post_processing_result == "success":
                 return {
                         "status": "success",
@@ -72,7 +72,7 @@ class get_user_favorites(Resource):
         screen_name = request.form["user_id"]
         offset = request.form["offset"]
 
-        user_status_result = get_user(screen_name, offset)
+        user_status_result = get_user(screen_name, offset, "favorites")
 
         if user_status_result == "no more results":
             user_status = user_status_result
@@ -94,7 +94,7 @@ class get_user_posts(Resource):
         screen_name = request.form["user_id"]
         offset = request.form["offset"]
 
-        user_status_result = get_user(screen_name, offset)
+        user_status_result = get_user(screen_name, offset, "posts")
 
         if user_status_result == "no more results":
             user_status = user_status_result
@@ -210,6 +210,9 @@ class verify_twit(Resource):
                 pg_ret = pg_cur.fetchone()
                 if pg_ret is not None:
                     (token, token_secret) = (pg_ret[0], pg_ret[1])
+                else:
+                    pg_con.close()
+                    return {"status": "Not authenticated"}
                 pg_con.close()
             except psycopg2.Error as e:
                 print(e)
@@ -277,7 +280,7 @@ def validate_search_user(twit_api_instance=None, screen_name=None):
     if user is None: return False
     else: return True
 
-def get_user(screen_name=None, offset=0):
+def get_user(screen_name=None, offset=0, post_type="favorites"):
     try: int(offset)
     except:
         print(isinstance(offset, int))
@@ -293,7 +296,11 @@ def get_user(screen_name=None, offset=0):
         return "db_error"
     else:
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
-        pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+        if post_type == "favorites":
+            pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+        else:
+            pg_cur.execute("""SELECT created_at, user_posts.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_posts JOIN twitter_posts ON user_posts.post_id = twitter_posts.post_id WHERE user_posts.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_posts.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+
         ret = pg_cur.fetchall()
         pg_con.close()
 
@@ -306,7 +313,6 @@ def get_posts(screen_name=None, twit_api_instance=None, post_type="favorites"):
         return "db access failure"
     else:
         try:
-            print(post_type)
             if post_type == "favorites":
                 posts = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
             elif post_type == "posts":
@@ -326,7 +332,6 @@ def get_posts(screen_name=None, twit_api_instance=None, post_type="favorites"):
                 create_time = datetime.strptime(post.created_at, '%a %b %d %H:%M:%S +0000 %Y')
                 str_create_time = create_time.strftime("%m/%d/%Y, %H:%M:%S")
                 pg_cur.execute("""INSERT INTO twitter_posts(created_at, post_id, text, name, screen_name, profile_image_url, possibly_sensitive, post_url) VALUES(%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;""",(str_create_time, post.id_str, post.text, post.user.name, post.user.screen_name, post.user.profile_image_url, str(post.possibly_sensitive), "https://twitter.com/"+post.user.screen_name+"/status/"+post.id_str)) 
-                # TODO - change out user_favorites below
                 if post_type == "favorites":
                     pg_cur.execute("""INSERT INTO user_favorites(screen_name, post_id) VALUES(%s,%s) ON CONFLICT DO NOTHING""", (screen_name, post.id_str))
                 elif post_type == "posts":
@@ -388,6 +393,8 @@ if __name__ == '__main__':
         pg_cur.execute("""DELETE FROM user_status;""")
         pg_con.commit()
         pg_cur.execute("""DELETE FROM user_favorites;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM user_posts;""")
         pg_con.commit()
         pg_cur.execute("""DELETE FROM twitter_posts;""")
         pg_con.commit()
