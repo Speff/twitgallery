@@ -46,20 +46,22 @@ class process_user(Resource):
 
             screen_name = request.form["user_id"]
 
-            user_status_result = check_user_status(screen_name, twit_api_instance)
+            user_db_status = check_user_status(screen_name)
+            if user_db_status != "success":
+                return {"status": "user already being processed"}, 200
 
-
-            if user_status_result == "db_error":
-                user_status = "db connection error"
-                status_code = 503
+            post_processing_result = get_posts_favorites(screen_name, twit_api_instance)
+            if post_processing_result == "success":
+                return {
+                        "status": "success",
+                        "user_ud": screen_name
+                        }, 202
             else:
-                user_status = user_status_result
-                status_code = 202
+                return {
+                        "status": "error",
+                        "user_id": screen_name
+                        }, 202
 
-            return {
-                    "status": user_status,
-                    "user_id": screen_name
-                    }, status_code
         else: 
             return{
                     "status": "Not authenticated"
@@ -266,6 +268,15 @@ def validate_twitter_credentials(twit_api_instance=None):
     if user is None: return False
     else: return True
 
+def validate_search_user(twit_api_instance=None, screen_name=None):
+    try: user = twit_api_instance.VerifyCredentials()
+    except Exception as e:
+        print("Twitter verify malfunctioned")
+        print(e)
+        return False
+    if user is None: return False
+    else: return True
+
 def get_user(screen_name=None, offset=0):
     try: int(offset)
     except:
@@ -289,10 +300,10 @@ def get_user(screen_name=None, offset=0):
         if len(ret) == 0: return "no more results"
         return ret
 
-def search_user(screen_name=None, twit_api_instance=None):
+def get_posts_favorites(screen_name=None, twit_api_instance=None):
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
-        return False
+        return "db access failure"
     else:
         try:
             favorites = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
@@ -301,7 +312,7 @@ def search_user(screen_name=None, twit_api_instance=None):
             pg_cur.execute("""DELETE FROM user_status WHERE screen_name=%s;""", (screen_name,))
             pg_con.commit()
             pg_con.close()
-            return False
+            return "twitter_lookup_failed"
         else:
             pg_cur = pg_con.cursor()
             for favorite in favorites:
@@ -330,10 +341,9 @@ def search_user(screen_name=None, twit_api_instance=None):
 
         pg_con.close()
 
-    return True
+    return "success"
 
-def check_user_status(screen_name, twit_api_instance=None):
-    if validate_twitter_credentials(twit_api_instance) == False: return "user not found"
+def check_user_status(screen_name=None):
     try:
         pg_con = psycopg2.connect(pg_connect_info)
     except:
@@ -347,7 +357,6 @@ def check_user_status(screen_name, twit_api_instance=None):
             pg_cur.execute("""INSERT INTO user_status(screen_name, status) VALUES (%s, 'started')""", (screen_name,))
             pg_con.commit()
             pg_con.close()
-            search_user(screen_name, twit_api_instance)
             return "success"
         else:
             pg_con.close()
@@ -359,18 +368,18 @@ def handler(signum, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handler)
 
-    #try:
-    #    pg_con = psycopg2.connect(pg_connect_info)
-    #except:
-    #    print("db error")
-    #else:
-    #    pg_cur = pg_con.cursor()
-    #    pg_cur.execute("""DELETE FROM user_status;""")
-    #    pg_con.commit()
-    #    pg_cur.execute("""DELETE FROM user_favorites;""")
-    #    pg_con.commit()
-    #    pg_cur.execute("""DELETE FROM twitter_posts;""")
-    #    pg_con.commit()
-    #    pg_con.close()
+    try:
+        pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        print("db error")
+    else:
+        pg_cur = pg_con.cursor()
+        pg_cur.execute("""DELETE FROM user_status;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM user_favorites;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM twitter_posts;""")
+        pg_con.commit()
+        pg_con.close()
     print("Started")
     app.run(host='0.0.0.0')
