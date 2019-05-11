@@ -27,7 +27,6 @@ body{
     filter: invert(100%);
     width: 100%;
     height: auto;
-    animation: shadow-pulse 1s infinite;
 }
 
 #page_console{

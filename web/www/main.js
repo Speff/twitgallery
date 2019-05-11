@@ -57,6 +57,7 @@ function display_images(user){
 
         if(data.status == "session not found" || data.status == "credentials no longer valid"){
             console.log("No session found");
+            $("#sign_in > img").css("animation", "shadow-pulse 1s infinite");
             query_in_progress = false;
             return false;
         }
