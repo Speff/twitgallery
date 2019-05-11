@@ -236,6 +236,13 @@ button {
 .modal_author{
 }
 
+#search_selected{
+    position: absolute;
+    text-align: right;
+    bottom: 0px;
+    right: 0px;
+}
+
 .modal_content img{
     margin: auto;
     opacity: 1.0;

@@ -3,7 +3,6 @@ var offset = 0;
 var image_count = 0;
 var query_in_progress = false;
 var no_more_images = false;
-var search_user_changed = true;
 var selected_image_fs = 0;
 var images_displayed = "favorites"
 
@@ -155,10 +154,21 @@ function display_modal(input){
     $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span id='search_selected'> [Search user] </span></h4>")
         .append()
         .append("<br><h5>" + current_post["data-text"].nodeValue + "</h5>");
-    $("#picture_fs").html(current_post["data-image"].nodeValue);
-
+    $("#picture_fs").html(current_post["data-image"].nodeValue)
     $("#picture_fs > img").css("max-width", "100vw");
     $("#picture_fs > img").css("max-height", $(window).height() - $("#picture_data").height());
+
+    var hidden_div = $("<div style='overflow:scroll;position:absolute;top:-99999px'></div>").appendTo("body");
+    var scrollbar_width = hidden_div.prop("offsetWidth") - hidden_div.prop("clientWidth");
+    hidden_div.remove();
+
+    $("#search_selected").css(
+        {
+            "right": scrollbar_width + 10,
+			"top": 5
+
+        }
+    );
 
     $("#search_selected").click(function(){
         $("#modal_fs").hide();
@@ -241,7 +251,6 @@ $(document).ready(function(){
     $("#get_user_favorites").click({"pt": "favorites"}, get_user_statuses);
     $("#get_user_posts").click({"pt": "posts"}, get_user_statuses);
     $("body").on('DOMSubtreeModified', "#user_input", function(){
-        search_user_changed = true;
         no_more_images = false;
     });
     $("#input").click(function(){
