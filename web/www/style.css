@@ -247,6 +247,7 @@ button {
     text-shadow: 2px 2px 4px black;
 
     z-index: 100;
+    cursor: pointer;
 }
 
 .modal_content img{
