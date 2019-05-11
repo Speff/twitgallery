@@ -171,7 +171,7 @@ function display_modal(input){
     $("#search_selected").css(
         {
             "right": scrollbar_width + 10,
-			"top": 5
+			"bottom": 5
 
         }
     );
