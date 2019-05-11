@@ -215,10 +215,11 @@ function check_if_mobile() {
 }
 
 function get_user_statuses(event){
-    console.log(event.data);
     images_displayed = event.data.pt;
     if(query_in_progress == false){
-        if(search_user_changed) $("#target").empty();
+        console.log("emptying grid");
+        $("#target").empty();
+        offset = 0;
 
         search_user_changed = false;
         query_in_progress = true;
