@@ -157,7 +157,7 @@ function display_modal(input){
     current_post = input.data.tag[0].attributes;
     $("#modal_fs").show();
 
-    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span id='search_selected'> [Search user] </span></h4>")
+    $("#picture_data").html("<h4 class='modal_author'><a href='" + current_post["data-post_url"].nodeValue + "' target='_blank'>" + current_post["data-name"].nodeValue + " (@" + current_post["data-screen_name"].nodeValue + ")</a><span id='search_selected'> <br>[Search user] </span></h4>")
         .append()
         .append("<br><h5>" + current_post["data-text"].nodeValue + "</h5>");
     $("#picture_fs").html(current_post["data-image"].nodeValue)
@@ -167,14 +167,6 @@ function display_modal(input){
     var hidden_div = $("<div style='overflow:scroll;position:absolute;top:-99999px'></div>").appendTo("body");
     var scrollbar_width = hidden_div.prop("offsetWidth") - hidden_div.prop("clientWidth");
     hidden_div.remove();
-
-    $("#search_selected").css(
-        {
-            "right": scrollbar_width + 10,
-			"bottom": 5
-
-        }
-    );
 
     $("#search_selected").click(function(){
         $("#modal_fs").hide();

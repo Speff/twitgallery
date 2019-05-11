@@ -238,10 +238,15 @@ button {
 }
 
 #search_selected{
-    position: absolute;
+    position: fixed;
+    display: flexbox;
     text-align: right;
-    bottom: 0px;
-    right: 0px;
+    bottom: 20px;
+    right: 20px;
+    font-weight: 100;
+    text-shadow: 2px 2px 4px black;
+
+    z-index: 100;
 }
 
 .modal_content img{
