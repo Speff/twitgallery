@@ -55,6 +55,12 @@ function display_images(user){
             return false;
         }
 
+        if(data.status == "session not found" || data.status == "credentials no longer valid"){
+            console.log("No session found");
+            query_in_progress = false;
+            return false;
+        }
+
         offset += 1;
 
         $.each(data.status, function(index, value){

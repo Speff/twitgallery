@@ -81,6 +81,8 @@ class get_user_statuses(Resource):
                     "status": user_status,
                     "user_id": screen_name
                     }, status_code
+        else:
+            return {"status": "session not found"}, 200
 
 def query_twitter_statuses(twit_api_instance, screen_name, post_type):
      #user_db_status = check_user_status(screen_name)
