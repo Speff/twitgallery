@@ -21,7 +21,7 @@ pg_connect_info = "dbname=twitgallery user=tg_user password=docker host=db"
 class get_user_statuses(Resource):
     def post(self):
         # Look for session in cookies sent
-        print("Looking for cookie in browser")
+        print("\n\n\nLooking for cookie in browser")
         if "tg_guid" in session:
             token = ''
             token_secret = ''

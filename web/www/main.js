@@ -123,8 +123,6 @@ function display_images(user){
             }
         });
 
-        console.log(offset);
-
         // Sort by area to optimize packing
         $("div#grid_invis > div").sort(function(a,b){
             if(is_mobile){
@@ -217,20 +215,20 @@ function check_if_mobile() {
 function get_user_statuses(event){
     images_displayed = event.data.pt;
     if(query_in_progress == false){
-        console.log("emptying grid");
         $("#target").empty();
+
         offset = 0;
-
-        search_user_changed = false;
+        no_more_images = false;
         query_in_progress = true;
-
         var user_to_process = "@" + $("#user_input").text();
+
         $("#target").append("<div id='grid' class='grid'></div>");
         $("#grid").packery({
             // options
             itemSelector: '.grid-item',
             stagger: 5,
         });
+
         display_images(user_to_process);
     }
 }
