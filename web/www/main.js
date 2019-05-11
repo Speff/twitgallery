@@ -103,8 +103,8 @@ function display_images(user){
                         scaled_size_x = scaled_size_y * AR;
                     }
                     if(is_mobile){
-                        scaled_size_x = scaled_size_x * 0.3;
-                        scaled_size_y = scaled_size_y * 0.3;
+                        scaled_size_x = scaled_size_x * 0.4;
+                        scaled_size_y = scaled_size_y * 0.4;
                     }
                     new_element.css("width", scaled_size_x);
                     new_element.css("height", scaled_size_y);
