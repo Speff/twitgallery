@@ -14,13 +14,9 @@ function check_if_signed_in(){
         console.log(data);
         if(data.status == "Authenticated"){
             $("#sign_in").hide();
-            $("#process_user_input").removeClass("enabled")
-                .css({"color": "initial"});
         }
         else{
             $("#sign_in").show();
-            $("#process_user_input").prop("disabled", true)
-                .css({"color": "gray"});
             $("#sign_in").click(sign_in);
         }
     })
@@ -52,7 +48,7 @@ function display_images(user){
         return false;
     }
 
-    $.post("/api/get_user_"+images_displayed, {"user_id": user, "offset": offset}, function(data, status){
+    $.post("/api/get_user_statuses", {"user_id": user, "offset": offset, "type": images_displayed}, function(data, status){
         if(status != "success"){
             $("#end_results_target").text("The End");
             query_in_progress = false;
@@ -218,70 +214,33 @@ function check_if_mobile() {
     } catch(e){ console.log("Error in isMobile"); return false; }
 }
 
+function get_user_statuses(event){
+    console.log(event.data);
+    images_displayed = event.data.pt;
+    if(query_in_progress == false){
+        if(search_user_changed) $("#target").empty();
+
+        search_user_changed = false;
+        query_in_progress = true;
+
+        var user_to_process = "@" + $("#user_input").text();
+        $("#target").append("<div id='grid' class='grid'></div>");
+        $("#grid").packery({
+            // options
+            itemSelector: '.grid-item',
+            stagger: 5,
+        });
+        display_images(user_to_process);
+    }
+}
+
 $(document).ready(function(){
     is_mobile = check_if_mobile();
     check_if_signed_in();
 
     $("#user_input").text("speff7");
-    $("#process_user_input").click(function(){
-        if(query_in_progress == false){
-            offset = 0;
-            query_in_progress = true;
-            $("#process_user_result").text("Processing User...");
-            var user_to_process = "@" + $("#user_input").text();
-            $.post("/api/process_user",
-                {
-                    "user_id": user_to_process,
-                    "post_type": "posts"
-                }, function(data, status){
-                    query_in_progress = false;
-                    if(status == "success"){
-                        $("#process_user_result").text("User processed successfully");
-                        no_more_images = false;
-                    }
-                    else{
-                        $("#process_user_result").text("User processing failed");
-                    }
-                });
-        }
-        else; // Do nothing. There's already a query in progress
-    });
-    $("#get_user_favorites").click(function(){
-        images_displayed = "favorites";
-        if(query_in_progress == false){
-            if(search_user_changed) $("#target").empty();
-
-            search_user_changed = false;
-            query_in_progress = true;
-
-            var user_to_process = "@" + $("#user_input").text();
-            $("#target").append("<div id='grid' class='grid'></div>");
-            $("#grid").packery({
-                // options
-                itemSelector: '.grid-item',
-                stagger: 5,
-            });
-            display_images(user_to_process);
-        }
-    });
-    $("#get_user_posts").click(function(){
-        images_displayed = "posts";
-        if(query_in_progress == false){
-            if(search_user_changed) $("#target").empty();
-
-            search_user_changed = false;
-            query_in_progress = true;
-
-            var user_to_process = "@" + $("#user_input").text();
-            $("#target").append("<div id='grid' class='grid'></div>");
-            $("#grid").packery({
-                // options
-                itemSelector: '.grid-item',
-                stagger: 5,
-            });
-            display_images(user_to_process);
-        }
-    });
+    $("#get_user_favorites").click({"pt": "favorites"}, get_user_statuses);
+    $("#get_user_posts").click({"pt": "posts"}, get_user_statuses);
     $("body").on('DOMSubtreeModified', "#user_input", function(){
         search_user_changed = true;
         no_more_images = false;

@@ -18,12 +18,16 @@ app.secret_key = os.environ["IPSO_COOKIE_AUTH"].encode("utf-8")
 
 pg_connect_info = "dbname=twitgallery user=tg_user password=docker host=db"
 
-class process_user(Resource):
+class get_user_statuses(Resource):
     def post(self):
+        # Look for session in cookies sent
+        print("Looking for cookie in browser")
         if "tg_guid" in session:
             token = ''
             token_secret = ''
 
+            print("Looking for cookie in db")
+            # Look for session cookie data in db
             try:
                 pg_con = psycopg2.connect(pg_connect_info)
                 pg_cur = pg_con.cursor()
@@ -31,85 +35,63 @@ class process_user(Resource):
                 pg_ret = pg_cur.fetchone()
                 if pg_ret is not None:
                     (token, token_secret) = (pg_ret[0], pg_ret[1])
+                else:
+                    return {"status": "session not found"}, 200
                 pg_con.close()
             except psycopg2.Error as e:
                 print(e)
-                return {"status": "db lookup failed"}, 200
+                return {"status": "db error looking up session"}, 200
 
+            # Grab form data
+            screen_name = request.form["user_id"]
+            offset = request.form["offset"]
+            post_type = request.form["type"]
+            print("Grabbing post data\nScreen_name: %s\nOffset: %s" % (screen_name, offset))
+
+            print("Forming Twitter API handle")
             twit_api_instance = twitter.Api(consumer_key=os.environ['CONSUMER_KEY'],
                     consumer_secret=os.environ['CONSUMER_SECRET'],
                     access_token_key=token,
                     access_token_secret=token_secret)
 
-            if validate_twitter_credentials(twit_api_instance) == False:
-                return {"status": "credentials no longer valid"}, 200
+            # Validate twitter credentials on first load
+            # A higher offset implies we already validated credentials
+            if offset == "0":
+                print("Validating twitter handle")
+                if validate_twitter_credentials(twit_api_instance) == False:
+                    return {"status": "credentials no longer valid"}, 200
+                print("Querying Twitter for favorites")
+                post_processing_result = get_posts(screen_name, twit_api_instance, post_type);
 
-            screen_name = request.form["user_id"]
+            # Collect user favorites by querying db
+            print("Grabbing statuses from DB")
+            user_status_result = get_user(screen_name, offset, post_type)
 
-            user_db_status = check_user_status(screen_name)
-            if user_db_status != "success":
-                return {"status": "user already being processed"}, 200
-
-            post_processing_result = get_posts(screen_name, twit_api_instance, request.form["post_type"])
-            if post_processing_result == "success":
-                return {
-                        "status": "success",
-                        "user_id": screen_name
-                        }, 202
+            if user_status_result == "no more results":
+                user_status = user_status_result
+                status_code = 204
+            elif user_status_result == "db_error":
+                user_status = "db connection error"
+                status_code = 503
             else:
-                return {
-                        "status": "error",
-                        "user_id": screen_name
-                        }, 202
+                user_status = user_status_result
+                status_code = 202
 
-        else: 
-            return{
-                    "status": "Not authenticated"
-                    }, 403
+            return {
+                    "status": user_status,
+                    "user_id": screen_name
+                    }, status_code
 
-class get_user_favorites(Resource):
-    def post(self):
-        screen_name = request.form["user_id"]
-        offset = request.form["offset"]
+def query_twitter_statuses(twit_api_instance, screen_name, post_type):
+     #user_db_status = check_user_status(screen_name)
+     #if user_db_status != "success":
+     #    return {"status": "user already being processed"}, 200
 
-        user_status_result = get_user(screen_name, offset, "favorites")
 
-        if user_status_result == "no more results":
-            user_status = user_status_result
-            status_code = 204
-        elif user_status_result == "db_error":
-            user_status = "db connection error"
-            status_code = 503
-        else:
-            user_status = user_status_result
-            status_code = 202
-
-        return {
-                "status": user_status,
-                "user_id": screen_name
-                }, status_code
-
-class get_user_posts(Resource):
-    def post(self):
-        screen_name = request.form["user_id"]
-        offset = request.form["offset"]
-
-        user_status_result = get_user(screen_name, offset, "posts")
-
-        if user_status_result == "no more results":
-            user_status = user_status_result
-            status_code = 204
-        elif user_status_result == "db_error":
-            user_status = "db connection error"
-            status_code = 503
-        else:
-            user_status = user_status_result
-            status_code = 202
-
-        return {
-                "status": user_status,
-                "user_id": screen_name
-                }, status_code
+     if post_processing_result == "success":
+         return True
+     else:
+         return False
 
 class get_auth_url(Resource):
     def get(self):
@@ -253,9 +235,7 @@ class sign_out(Resource):
         return {"status": "Signed out"}, 200
 
 
-api.add_resource(process_user, '/process_user')
-api.add_resource(get_user_favorites, '/get_user_favorites')
-api.add_resource(get_user_posts, '/get_user_posts')
+api.add_resource(get_user_statuses, '/get_user_statuses')
 api.add_resource(auth_twit, '/auth_twit')
 api.add_resource(verify_twit, '/verify_twit')
 api.add_resource(get_auth_url, '/get_auth_url')
