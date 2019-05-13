@@ -55,17 +55,18 @@ class get_user_statuses(Resource):
                     access_token_secret=token_secret)
 
             # Validate twitter credentials on first load
+            # Query for initial images
             # A higher offset implies we already validated credentials
             if offset == "0":
                 print("Validating twitter handle")
                 if validate_twitter_credentials(twit_api_instance) == False:
                     return {"status": "credentials no longer valid"}, 200
                 print("Querying Twitter for favorites")
-                post_processing_result = get_posts(screen_name, twit_api_instance, post_type);
+                post_processing_result = query_twitter_posts(screen_name, twit_api_instance, post_type);
 
             # Collect user favorites by querying db
             print("Grabbing statuses from DB")
-            user_status_result = get_user(screen_name, offset, post_type)
+            user_status_result = get_posts(screen_name, offset, post_type)
 
             if user_status_result == "no more results":
                 user_status = user_status_result
@@ -83,17 +84,6 @@ class get_user_statuses(Resource):
                     }, status_code
         else:
             return {"status": "session not found"}, 200
-
-def query_twitter_statuses(twit_api_instance, screen_name, post_type):
-     #user_db_status = check_user_status(screen_name)
-     #if user_db_status != "success":
-     #    return {"status": "user already being processed"}, 200
-
-
-     if post_processing_result == "success":
-         return True
-     else:
-         return False
 
 class get_auth_url(Resource):
     def get(self):
@@ -262,7 +252,7 @@ def validate_search_user(twit_api_instance=None, screen_name=None):
     if user is None: return False
     else: return True
 
-def get_user(screen_name=None, offset=0, post_type="favorites"):
+def get_posts(screen_name=None, offset=0, post_type="favorites"):
     try: int(offset)
     except:
         print(isinstance(offset, int))
@@ -289,7 +279,7 @@ def get_user(screen_name=None, offset=0, post_type="favorites"):
         if len(ret) == 0: return "no more results"
         return ret
 
-def get_posts(screen_name=None, twit_api_instance=None, post_type="favorites"):
+def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="favorites"):
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
         return "db access failure"
