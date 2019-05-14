@@ -383,20 +383,20 @@ def handler(signum, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handler)
 
-    try:
-        pg_con = psycopg2.connect(pg_connect_info)
-    except:
-        print("db error")
-    else:
-        pg_cur = pg_con.cursor()
-        pg_cur.execute("""DELETE FROM user_status;""")
-        pg_con.commit()
-        pg_cur.execute("""DELETE FROM user_favorites;""")
-        pg_con.commit()
-        pg_cur.execute("""DELETE FROM user_posts;""")
-        pg_con.commit()
-        pg_cur.execute("""DELETE FROM twitter_posts;""")
-        pg_con.commit()
-        pg_con.close()
+    #try:
+    #    pg_con = psycopg2.connect(pg_connect_info)
+    #except:
+    #    print("db error")
+    #else:
+    #    pg_cur = pg_con.cursor()
+    #    pg_cur.execute("""DELETE FROM user_status;""")
+    #    pg_con.commit()
+    #    pg_cur.execute("""DELETE FROM user_favorites;""")
+    #    pg_con.commit()
+    #    pg_cur.execute("""DELETE FROM user_posts;""")
+    #    pg_con.commit()
+    #    pg_cur.execute("""DELETE FROM twitter_posts;""")
+    #    pg_con.commit()
+    #    pg_con.close()
     print("Started")
     app.run(host='0.0.0.0')

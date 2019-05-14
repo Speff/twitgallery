@@ -173,7 +173,8 @@ function display_modal(input){
         $("#modal_fs").hide();
         $("#user_input").text(current_post["data-screen_name"].nodeValue);
         $("#grid").remove();
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        offset = 0;
 
     });
 };
