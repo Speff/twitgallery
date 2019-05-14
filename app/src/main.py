@@ -199,9 +199,10 @@ class verify_twit(Resource):
 
                 user = twit_api.VerifyCredentials()
                 if user is not None:
+                    print(user)
                     return {
                             "status": "Authenticated",
-                            "twitter_user": user.name,
+                            "twitter_user": user.screen_name,
                             "profile_img_url": user.profile_image_url_https
                             }, 202
                 else:
