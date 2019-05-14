@@ -13,6 +13,7 @@ function check_if_signed_in(){
         console.log(data);
         if(data.status == "Authenticated"){
             $("#sign_in").hide();
+            $("#user_input").text(data.twitter_user);
         }
         else{
             $("#sign_in").show();
@@ -245,9 +246,10 @@ function get_user_statuses(event){
 
 $(document).ready(function(){
     is_mobile = check_if_mobile();
+    $("#user_input").text("[screen_name]");
+
     check_if_signed_in();
 
-    $("#user_input").text("speff7");
     $("#get_user_favorites").click({"pt": "favorites"}, get_user_statuses);
     $("#get_user_posts").click({"pt": "posts"}, get_user_statuses);
     $("body").on('DOMSubtreeModified', "#user_input", function(){
