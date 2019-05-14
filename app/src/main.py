@@ -21,12 +21,10 @@ pg_connect_info = "dbname=twitgallery user=tg_user password=docker host=db"
 class get_user_statuses(Resource):
     def post(self):
         # Look for session in cookies sent
-        print("\n\n\nLooking for cookie in browser")
         if "tg_guid" in session:
             token = ''
             token_secret = ''
 
-            print("Looking for cookie in db")
             # Look for session cookie data in db
             try:
                 pg_con = psycopg2.connect(pg_connect_info)
@@ -46,26 +44,28 @@ class get_user_statuses(Resource):
             screen_name = request.form["user_id"]
             offset = request.form["offset"]
             post_type = request.form["type"]
-            print("Grabbing post data\nScreen_name: %s\nOffset: %s" % (screen_name, offset))
 
-            print("Forming Twitter API handle")
             twit_api_instance = twitter.Api(consumer_key=os.environ['CONSUMER_KEY'],
                     consumer_secret=os.environ['CONSUMER_SECRET'],
                     access_token_key=token,
                     access_token_secret=token_secret)
 
-            # Validate twitter credentials on first load
-            # Query for initial images
-            # A higher offset implies we already validated credentials
             if offset == "0":
-                print("Validating twitter handle")
+                # Validate twitter credentials on first load
+                # Query for initial images
+                # A higher offset implies we already validated credentials
                 if validate_twitter_credentials(twit_api_instance) == False:
                     return {"status": "credentials no longer valid"}, 200
-                print("Querying Twitter for favorites")
-                post_processing_result = query_twitter_posts(screen_name, twit_api_instance, post_type);
+                post_processing_result = query_twitter_posts(screen_name, twit_api_instance, post_type, new_max=None);
+            else:
+                # Check if offset is getting near the end. If it is, then do an additional query
+                # Check if query return 0. If zero, no more posts to query
+                pos = int(offset) * 20;
+                n_db_records, oldest_status_id = get_number_of_statuses(screen_name, post_type)
+                if n_db_records - pos < 40:
+                    post_processing_result = query_twitter_posts(screen_name, twit_api_instance, post_type, oldest_status_id);
 
             # Collect user favorites by querying db
-            print("Grabbing statuses from DB")
             user_status_result = get_posts(screen_name, offset, post_type)
 
             if user_status_result == "no more results":
@@ -96,7 +96,6 @@ class get_auth_url(Resource):
             consumer_secret = os.environ['CONSUMER_SECRET']
             consumer = oauth.Consumer(consumer_key, consumer_secret)
 
-            print(os.environ['CALLBACK_URL'])
             request_token_url = "https://api.twitter.com/oauth/request_token?oauth_callback=" + os.environ['CALLBACK_URL']
             authorize_url = 'https://api.twitter.com/oauth/authorize'
 
@@ -252,6 +251,28 @@ def validate_search_user(twit_api_instance=None, screen_name=None):
     if user is None: return False
     else: return True
 
+def get_number_of_statuses(screen_name=None, post_type="favorites"):
+    try: pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        return "db_error"
+    else:
+        pg_cur = pg_con.cursor()
+        if post_type == "favorites":
+            pg_cur.execute("""SELECT COUNT(*) FROM user_favorites WHERE screen_name=%s;""", (screen_name, ))
+        else:
+            pg_cur.execute("""SELECT COUNT(*) FROM user_posts WHERE screen_name=%s;""", (screen_name, ))
+        count = pg_cur.fetchone()[0]
+
+        if post_type == "favorites":
+            pg_cur.execute("""SELECT CAST(post_id AS bigint) FROM user_favorites WHERE screen_name=%s ORDER BY post_id ASC LIMIT 1;""", (screen_name, ))
+        else:
+            pg_cur.execute("""SELECT CAST(post_id AS bigint) FROM user_posts WHERE screen_name=%s ORDER BY post_id ASC LIMIT 1;""", (screen_name, ))
+        oldest_id = pg_cur.fetchone()[0]
+
+        pg_con.close()
+
+        return count, oldest_id
+
 def get_posts(screen_name=None, offset=0, post_type="favorites"):
     try: int(offset)
     except:
@@ -279,16 +300,22 @@ def get_posts(screen_name=None, offset=0, post_type="favorites"):
         if len(ret) == 0: return "no more results"
         return ret
 
-def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="favorites"):
+def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="favorites", new_max=None):
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
         return "db access failure"
     else:
         try:
             if post_type == "favorites":
-                posts = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
+                if new_max is not None:
+                    posts = twit_api_instance.GetFavorites(screen_name=screen_name, max_id=new_max, count=200)
+                else:
+                    posts = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
             elif post_type == "posts":
-                posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, count=200)
+                if new_max is not None:
+                    posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, max_id=new_max, count=200)
+                else:
+                    posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, count=200)
             else:
                 raise Exception('wtf you sending me')
         except Exception as e:
@@ -356,20 +383,20 @@ def handler(signum, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handler)
 
-    #try:
-    #    pg_con = psycopg2.connect(pg_connect_info)
-    #except:
-    #    print("db error")
-    #else:
-    #    pg_cur = pg_con.cursor()
-    #    pg_cur.execute("""DELETE FROM user_status;""")
-    #    pg_con.commit()
-    #    pg_cur.execute("""DELETE FROM user_favorites;""")
-    #    pg_con.commit()
-    #    pg_cur.execute("""DELETE FROM user_posts;""")
-    #    pg_con.commit()
-    #    pg_cur.execute("""DELETE FROM twitter_posts;""")
-    #    pg_con.commit()
-    #    pg_con.close()
+    try:
+        pg_con = psycopg2.connect(pg_connect_info)
+    except:
+        print("db error")
+    else:
+        pg_cur = pg_con.cursor()
+        pg_cur.execute("""DELETE FROM user_status;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM user_favorites;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM user_posts;""")
+        pg_con.commit()
+        pg_cur.execute("""DELETE FROM twitter_posts;""")
+        pg_con.commit()
+        pg_con.close()
     print("Started")
     app.run(host='0.0.0.0')
