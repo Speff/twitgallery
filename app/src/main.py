@@ -399,4 +399,4 @@ if __name__ == '__main__':
     #    pg_con.commit()
     #    pg_con.close()
     print("Started")
-    app.run(host='0.0.0.0')
+    #app.run(host='0.0.0.0')

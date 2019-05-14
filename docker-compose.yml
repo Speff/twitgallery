@@ -4,6 +4,8 @@ services:
     web:
         container_name: twitgallery_web
         build: './web'
+        depends_on:
+            - db
         ports:
             - 1024:80
         volumes:
@@ -13,8 +15,6 @@ services:
     app:
         container_name: twitgallery_app
         build: './app'
-        ports:
-            - 5000:5000
         depends_on:
             - db
         volumes:
