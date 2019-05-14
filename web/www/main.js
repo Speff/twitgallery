@@ -246,7 +246,7 @@ function get_user_statuses(event){
 
 $(document).ready(function(){
     is_mobile = check_if_mobile();
-    $("#user_input").text("[screen_name]");
+    $("#user_input").text("");
 
     check_if_signed_in();
 
