@@ -122,7 +122,8 @@ function display_images(user){
                     new_element.attr("data-"+"screen_name", value["screen_name"]);
                     new_element.attr("data-"+"profile_image_url", value["profile_image_url"]);
                     new_element.attr("data-"+"possibly_sensitive", value["possibly_sensitive"]);
-                    new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i]+":large'></img>");
+                    post_html += "<img class='main_image cover' src='" + value["media_url_"+i].replace("http:", "https:") + ":small'></img>";
+                    new_element.attr("data-"+"image", "<img src='"+value["media_url_"+i].replace("http", "https")+":large'></img>");
 
                     var img_src = new_element.click({"tag": new_element}, display_modal);
                     image_count += 1;
