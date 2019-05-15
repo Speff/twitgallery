@@ -135,12 +135,18 @@ function display_images(user){
             if(is_mobile){
                 var var_a = parseInt($(a).attr("data-height"));
                 var var_b = parseInt($(b).attr("data-height"));
-                return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
+                if(offset%2 != 0)
+                    return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
+                else
+                    return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
             }
             else{
                 var var_a = parseInt($(a).attr("data-height"))*parseInt($(a).attr("data-width"));
                 var var_b = parseInt($(b).attr("data-height"))*parseInt($(b).attr("data-width"));
-                return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
+                if(offset%2 != 0)
+                    return (var_a > var_b) ? -1 : (var_a < var_b) ? 1 : 0;
+                else
+                    return (var_a < var_b) ? -1 : (var_a > var_b) ? 1 : 0;
             }
         }).appendTo("div#grid_invis");
 
