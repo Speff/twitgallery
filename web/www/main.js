@@ -72,7 +72,7 @@ function display_images(user){
                     post_html += "<p class='loading_message'>Loading...</p>";
                     post_html += "<img class='main_image cover' src='" + value["media_url_"+i].replace("http:", "https:") + ":small'></img>";
 
-                    if(is_mobile);
+                    if(false);
                     else
                         post_html += "<img class='blur_image' src='" + value["media_url_"+i].replace("http:", "https:") + ":small'></img>";
 
