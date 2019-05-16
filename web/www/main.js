@@ -157,6 +157,11 @@ function display_images(user){
 
 
         query_in_progress = false;
+
+        var scroll_pos = $(document).scrollTop() + $(window).height();
+        if($("#footer").offset().top - scroll_pos < 700)
+            setTimeout(fetch_more, 100);
+
     }, "json");
 }
 
@@ -208,17 +213,29 @@ $(document).keyup(function(e) {
     if(e.key == "Escape") $("#modal_fs").hide();
 });
 
-$(document).on("scroll", function(e){
+function fetch_more(){
     var scroll_pos = $(document).scrollTop() + $(window).height();
-    //$("#page_console").text(scroll_pos + " / " + $(document).height() + " is_mobile: " + is_mobile);
-    if($("#footer").offset().top - scroll_pos < 700){
-        if(query_in_progress == false){
-            query_in_progress = true;
-            var user_to_process = "@" + $("#user_input").text();
-            display_images(user_to_process);
-        }
+
+    if(query_in_progress == false){
+        query_in_progress = true;
+        var user_to_process = "@" + $("#user_input").text();
+        display_images(user_to_process);
     }
-});
+}
+
+function scroll_func(){
+    var scroll_pos = $(document).scrollTop() + $(window).height();
+    if($("#footer").offset().top - scroll_pos < 700){
+        $(document).off("scroll");
+        setTimeout(function(){
+            $(document).on("scroll", scroll_func);
+        }, 500);
+
+        fetch_more();
+    }
+
+}
+
 
 function check_if_mobile() {
     try {
@@ -280,5 +297,6 @@ $(document).ready(function(){
     $("span#user_input").keypress(function(e){
         if(e.keyCode === 10 || e.keyCode === 13) e.preventDefault();
     });
+    $(document).on("scroll", scroll_func);
 });
 
