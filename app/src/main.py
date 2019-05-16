@@ -201,6 +201,7 @@ class verify_twit(Resource):
                     user = twit_api.VerifyCredentials()
                 except Exception as e:
                     print(e)
+                    return {"status": "twitter auth not accepted"}, 200
                 else:
                     if user is not None:
                         return {
