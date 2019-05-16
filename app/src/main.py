@@ -197,15 +197,19 @@ class verify_twit(Resource):
                         access_token_key=token,
                         access_token_secret=token_secret)
 
-                user = twit_api.VerifyCredentials()
-                if user is not None:
-                    return {
-                            "status": "Authenticated",
-                            "twitter_user": user.screen_name,
-                            "profile_img_url": user.profile_image_url_https
-                            }, 202
+                try:
+                    user = twit_api.VerifyCredentials()
+                except Exception as e:
+                    print(e)
                 else:
-                    return {"status": "twitter auth error"}, 200
+                    if user is not None:
+                        return {
+                                "status": "Authenticated",
+                                "twitter_user": user.screen_name,
+                                "profile_img_url": user.profile_image_url_https
+                                }, 202
+                    else:
+                        return {"status": "twitter auth error"}, 200
             else:
                 return {"status": "twitter auth not accepted"}, 200
         else:
