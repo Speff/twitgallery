@@ -52,37 +52,48 @@ class get_user_statuses(Resource):
 
             query_result = ""
 
-            print(offset)
-            if offset == "0":
-                # Validate twitter credentials on first load
-                # Query for initial images
-                # A higher offset implies we already validated credentials
-                if validate_twitter_credentials(twit_api_instance) == False:
-                    return {"status": "credentials no longer valid"}, 200
-                query_result = query_twitter_posts(screen_name, twit_api_instance, post_type, new_max=None);
-            else:
-                # Check if offset is getting near the end. If it is, then do an additional query
-                # Check if query return 0. If zero, no more posts to query
-                pos = int(offset);
-                n_db_records, oldest_status_id = get_number_of_statuses(screen_name, post_type)
-                if n_db_records - pos < 40:
-                    query_result = query_twitter_posts(screen_name, twit_api_instance, post_type, oldest_status_id);
+            posts = []
+            status_code = 503
+            new_offset = offset
 
-            # Collect user favorites by querying db
-            user_status_result = get_posts(screen_name, offset, post_type)
+            while len(posts) < 20:
+                if new_offset == "0":
+                    # Validate twitter credentials on first load
+                    # Query for initial images
+                    # A higher offset implies we already validated credentials
+                    if validate_twitter_credentials(twit_api_instance) == False:
+                        return {"status": "credentials no longer valid"}, 200
+                    query_result = query_twitter_posts(screen_name, twit_api_instance, post_type, new_max=None);
 
-            if query_result == "no more posts":
-                user_status = user_status_result
-                status_code = 204
-            elif user_status_result == "db_error":
-                user_status = "db connection error"
-                status_code = 503
-            else:
-                user_status = user_status_result
-                status_code = 202
+                # Collect user favorites by querying db
+                new_offset, user_status, posts_ret = get_posts(screen_name, new_offset, post_type)
+                
+                if user_status == "no more stored images":
+                    pos = int(new_offset);
+                    n_db_records, oldest_status_id = get_number_of_statuses(screen_name, post_type)
+                    if n_db_records - pos < 40:
+                        query_result = query_twitter_posts(screen_name, twit_api_instance, post_type, oldest_status_id);
+
+                        if query_result == "no more posts":
+                            if len(posts) == 0:
+                                status_code = 204
+                                break
+                            else:
+                                user_status = "end of posts";
+                                status_code = 202
+                                break
+
+                elif user_status == "db_error":
+                    status_code = 503
+                    break
+                else:
+                    posts += posts_ret
+                    status_code = 202
 
             return {
+                    "posts": posts,
                     "status": user_status,
+                    "last_offset": new_offset,
                     "user_id": screen_name
                     }, status_code
         else:
@@ -285,16 +296,16 @@ def get_posts(screen_name=None, offset=0, post_type="favorites"):
     try: int(offset)
     except:
         print(isinstance(offset, int))
-        return "invalid offset"
+        return 0, "invalid offset", 0
     else:
         if int(offset) < 0:
-            return "invalid offset"
-        if int(offset) > 3000:
-            return "offset too large"
+            return 0, "invalid offset", 0
+        if int(offset) > 5000:
+            return 0, "offset too large", 0
 
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
-        return "db_error"
+        return 0, "db_error", 0
     else:
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
 
@@ -303,23 +314,25 @@ def get_posts(screen_name=None, offset=0, post_type="favorites"):
         else:
             pg_cur.execute("""SELECT created_at, user_posts.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_posts JOIN twitter_posts ON user_posts.post_id = twitter_posts.post_id WHERE user_posts.screen_name=%s ORDER BY (user_posts.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)))
 
-        ret = pg_cur.fetchall()
+        posts = pg_cur.fetchall()
 
-        if len(ret) == 0: 
-            return "no more results"
+        if len(posts) == 0: 
+            return offset, "no more stored images", 0
 
-        for post in ret:
-            print(post["post_id"])
+        last_offset = str(int(offset) + len(posts))
+
+        posts[:] = [post for post in posts if post["media_url_0"] is not None] 
+
         pg_con.close()
-        return ret
+        return last_offset, "got posts", posts
 
 def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="favorites", new_max=None):
+    print("Querying twitter")
     try: pg_con = psycopg2.connect(pg_connect_info)
     except:
         return "db access failure"
     else:
         try:
-            print("Querying twitter")
             if post_type == "favorites":
                 if new_max is not None:
                     posts = twit_api_instance.GetFavorites(screen_name=screen_name, max_id=new_max-1, count=200)
@@ -340,8 +353,6 @@ def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="fav
             pg_con.close()
             return "twitter_lookup_failed"
         else:
-            for post in posts:
-                print(post)
             if len(posts) == 0:
                 return "no more posts"
             pg_cur = pg_con.cursor()

@@ -64,7 +64,8 @@ function display_images(user){
     show_status("Fetching more images", 2000);
 
     $.post("/api/get_user_statuses", {"user_id": user, "offset": offset, "type": images_displayed}, function(data, status){
-        if(status != "success"){
+        if(data.status == "no more stored images" || status != "success"){
+            console.log("End of images");
             $("#end_results_target").text("The End");
             query_in_progress = false;
             no_more_images = true;
@@ -84,8 +85,9 @@ function display_images(user){
         }
 
 
-        offset += data.status.length;
-        $.each(data.status, function(index, value){
+        offset = parseInt(data.last_offset);
+        $.each(data.posts, function(index, value){
+            console.log(value);
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
 
@@ -178,6 +180,14 @@ function display_images(user){
 
 
         query_in_progress = false;
+
+        if(data.status == "end of posts"){
+            console.log("End of images");
+            $("#end_results_target").text("The End");
+            query_in_progress = false;
+            no_more_images = true;
+            return false;
+        }
 
         var scroll_pos = $(document).scrollTop() + $(window).height();
         if($("#footer").offset().top - scroll_pos < 700 ){
