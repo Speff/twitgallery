@@ -294,15 +294,19 @@ def get_posts(screen_name=None, offset=0, post_type="favorites"):
         return "db_error"
     else:
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
+
         if post_type == "favorites":
-            pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+            pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
         else:
-            pg_cur.execute("""SELECT created_at, user_posts.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_posts JOIN twitter_posts ON user_posts.post_id = twitter_posts.post_id WHERE user_posts.screen_name=%s AND media_url_0 IS NOT NULL ORDER BY (user_posts.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+            pg_cur.execute("""SELECT created_at, user_posts.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_posts JOIN twitter_posts ON user_posts.post_id = twitter_posts.post_id WHERE user_posts.screen_name=%s ORDER BY (user_posts.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
 
         ret = pg_cur.fetchall()
-        pg_con.close()
 
         if len(ret) == 0: return "no more results"
+
+        #for post in ret:
+        #    print(post["media_url_0"])
+        pg_con.close()
         return ret
 
 def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="favorites", new_max=None):
