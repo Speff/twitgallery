@@ -8,14 +8,27 @@ var images_displayed = "favorites"
 
 var is_mobile = false;
 
+function show_status(message, duration){
+    console.log("Showing status");
+    $("#status_message").text(message)
+        .css("width",(message.length * 1.2) + "ch");
+    $("#status_message_container").slideDown(100, function(){});
+
+    setTimeout(function(){
+        $("#status_message_container").slideUp(100, function(){});
+    }, duration);
+}
+
 function check_if_signed_in(){
     $.get("/api/verify_twit", function(data){
         console.log(data);
         if(data.status == "Authenticated"){
             $("#sign_in").hide();
             $("#user_input").text(data.twitter_user);
+            show_status("Signed in", 2000);
         }
         else{
+            show_status("Not signed in. Click twitter icon", 200000);
             $("#sign_in").show();
             $("#sign_in").click(sign_in);
         }
@@ -47,6 +60,8 @@ function display_images(user){
         query_in_progress = false;
         return false;
     }
+
+    show_status("Fetching more images", 2000);
 
     $.post("/api/get_user_statuses", {"user_id": user, "offset": offset, "type": images_displayed}, function(data, status){
         if(status != "success"){

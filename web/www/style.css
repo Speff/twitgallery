@@ -36,16 +36,6 @@ body{
     height: auto;
 }
 
-#page_console{
-    position: fixed;
-    float: left;
-    left: 0;
-    bottom: 0;
-    font-size: 4vh;
-    color: #ffffff;
-    text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black;
-    z-index: 999;
-}
 #header{
     margin-top: 0px;
     padding-top: 1.5vh;
@@ -321,9 +311,25 @@ button {
 }
 
 
+#status_message_container{
+    display: none;
+    position: fixed; /* Stay in place */
+    bottom: 0vw;
+    width: 100%;
+    z-index: 999;
+}
+#status_message{
+    margin: auto;
+    font-size: 1.0em;
+    text-align: center;
+    color: #f7f7f7;
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
 #footer{
     font-size: 0.9em;
-    margin-right: 1vw;
+    width: 98vw;
     text-align: right;
+    margin: auto;
     color: #999999;
 }
