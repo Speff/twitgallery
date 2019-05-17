@@ -78,11 +78,17 @@ function display_images(user){
             return false;
         }
 
-        offset += 1;
+        if(data.status == "no more results"){
+            display_images(user);
+            return false;
+        }
 
+
+        offset += data.status.length;
         $.each(data.status, function(index, value){
             for(var i = 0; i < 4; i++){
                 if(value["media_url_"+i] != null){
+
                     var post_html = "<div id='post_"+image_count+"' class='grid-item'>";
                     post_html += "<p class='loading_message'>Loading...</p>";
                     post_html += "<img class='main_image cover' src='" + value["media_url_"+i].replace("http:", "https:") + ":small'></img>";
@@ -174,8 +180,10 @@ function display_images(user){
         query_in_progress = false;
 
         var scroll_pos = $(document).scrollTop() + $(window).height();
-        if($("#footer").offset().top - scroll_pos < 700)
+        if($("#footer").offset().top - scroll_pos < 700 ){
+            console.log("Getting more images");
             setTimeout(fetch_more, 100);
+        }
 
     }, "json");
 }
@@ -229,8 +237,6 @@ $(document).keyup(function(e) {
 });
 
 function fetch_more(){
-    var scroll_pos = $(document).scrollTop() + $(window).height();
-
     if(query_in_progress == false){
         query_in_progress = true;
         var user_to_process = "@" + $("#user_input").text();

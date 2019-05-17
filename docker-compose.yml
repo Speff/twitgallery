@@ -25,6 +25,8 @@ services:
         restart: always
     db:
         container_name: twitgallery_db
+        ports:
+            - 5432:5432
         environment:
             - POSTGRES_USER=tg_user
             - POSTGRES_PASSWORD=docker

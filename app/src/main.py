@@ -50,25 +50,28 @@ class get_user_statuses(Resource):
                     access_token_key=token,
                     access_token_secret=token_secret)
 
+            query_result = ""
+
+            print(offset)
             if offset == "0":
                 # Validate twitter credentials on first load
                 # Query for initial images
                 # A higher offset implies we already validated credentials
                 if validate_twitter_credentials(twit_api_instance) == False:
                     return {"status": "credentials no longer valid"}, 200
-                post_processing_result = query_twitter_posts(screen_name, twit_api_instance, post_type, new_max=None);
+                query_result = query_twitter_posts(screen_name, twit_api_instance, post_type, new_max=None);
             else:
                 # Check if offset is getting near the end. If it is, then do an additional query
                 # Check if query return 0. If zero, no more posts to query
-                pos = int(offset) * 20;
+                pos = int(offset);
                 n_db_records, oldest_status_id = get_number_of_statuses(screen_name, post_type)
                 if n_db_records - pos < 40:
-                    post_processing_result = query_twitter_posts(screen_name, twit_api_instance, post_type, oldest_status_id);
+                    query_result = query_twitter_posts(screen_name, twit_api_instance, post_type, oldest_status_id);
 
             # Collect user favorites by querying db
             user_status_result = get_posts(screen_name, offset, post_type)
 
-            if user_status_result == "no more results":
+            if query_result == "no more posts":
                 user_status = user_status_result
                 status_code = 204
             elif user_status_result == "db_error":
@@ -286,7 +289,7 @@ def get_posts(screen_name=None, offset=0, post_type="favorites"):
     else:
         if int(offset) < 0:
             return "invalid offset"
-        if int(offset) > 500:
+        if int(offset) > 3000:
             return "offset too large"
 
     try: pg_con = psycopg2.connect(pg_connect_info)
@@ -296,16 +299,17 @@ def get_posts(screen_name=None, offset=0, post_type="favorites"):
         pg_cur = pg_con.cursor(cursor_factory=RealDictCursor)
 
         if post_type == "favorites":
-            pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+            pg_cur.execute("""SELECT created_at, user_favorites.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_favorites JOIN twitter_posts ON user_favorites.post_id = twitter_posts.post_id WHERE user_favorites.screen_name=%s ORDER BY (user_favorites.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)))
         else:
-            pg_cur.execute("""SELECT created_at, user_posts.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_posts JOIN twitter_posts ON user_posts.post_id = twitter_posts.post_id WHERE user_posts.screen_name=%s ORDER BY (user_posts.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)*20))
+            pg_cur.execute("""SELECT created_at, user_posts.post_id, text, name, twitter_posts.screen_name, profile_image_url, possibly_sensitive, post_url, media_url_0, media_url_1, media_url_2, media_url_3, media_url_0_size_x, media_url_1_size_x, media_url_2_size_x, media_url_3_size_x, media_url_0_size_y, media_url_1_size_y, media_url_2_size_y, media_url_3_size_y FROM user_posts JOIN twitter_posts ON user_posts.post_id = twitter_posts.post_id WHERE user_posts.screen_name=%s ORDER BY (user_posts.post_id::bigint) DESC LIMIT 20 OFFSET %s;""", (screen_name, int(offset)))
 
         ret = pg_cur.fetchall()
 
-        if len(ret) == 0: return "no more results"
+        if len(ret) == 0: 
+            return "no more results"
 
-        #for post in ret:
-        #    print(post["media_url_0"])
+        for post in ret:
+            print(post["post_id"])
         pg_con.close()
         return ret
 
@@ -315,16 +319,17 @@ def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="fav
         return "db access failure"
     else:
         try:
+            print("Querying twitter")
             if post_type == "favorites":
                 if new_max is not None:
-                    posts = twit_api_instance.GetFavorites(screen_name=screen_name, max_id=new_max, count=200)
+                    posts = twit_api_instance.GetFavorites(screen_name=screen_name, max_id=new_max-1, count=200)
                 else:
                     posts = twit_api_instance.GetFavorites(screen_name=screen_name, count=200)
             elif post_type == "posts":
                 if new_max is not None:
-                    posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, max_id=new_max, count=200)
+                    posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, max_id=new_max-1, count=200, include_rts=False)
                 else:
-                    posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, count=200)
+                    posts = twit_api_instance.GetUserTimeline(screen_name=screen_name, count=200, include_rts=False)
             else:
                 raise Exception('wtf you sending me')
         except Exception as e:
@@ -335,6 +340,10 @@ def query_twitter_posts(screen_name=None, twit_api_instance=None, post_type="fav
             pg_con.close()
             return "twitter_lookup_failed"
         else:
+            for post in posts:
+                print(post)
+            if len(posts) == 0:
+                return "no more posts"
             pg_cur = pg_con.cursor()
             for post in posts:
                 create_time = datetime.strptime(post.created_at, '%a %b %d %H:%M:%S +0000 %Y')
