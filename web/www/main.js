@@ -208,8 +208,12 @@ function display_modal(input){
         $("#modal_fs").hide();
         $("#user_input").text(current_post["data-screen_name"].nodeValue);
         $("#grid").remove();
+
+        $(document).off("scroll");
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        offset = 0;
+        setTimeout(function(){
+            $(document).on("scroll", scroll_func);
+        }, 500);
 
     });
 };
@@ -237,6 +241,7 @@ $(document).keyup(function(e) {
 });
 
 function fetch_more(){
+    console.log("fetching more");
     if(query_in_progress == false){
         query_in_progress = true;
         var user_to_process = "@" + $("#user_input").text();
